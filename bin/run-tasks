@@ -1,0 +1,39 @@
+<?php
+
+	Class RunTasks extends ShellCommand{
+		public function run(array $args=NULL){
+			
+			if(!Shell::instance()->isLoggedIn()){
+				fputs(STDERR, "Valid authentication token must be supplied.\n");
+				exit(1);
+			}
+			
+			if(!Shell::instance()->Author->isDeveloper()){
+				fputs(STDERR, "Only developers can run cron related tasks.\n");
+				exit(1);
+			}			
+			
+			$driver = Shell::instance()->ExtensionManager->create('cron');
+			
+			$iterator = new CronTaskIterator(MANIFEST . '/cron');
+
+			$tasks = array();
+
+			foreach($iterator as $task){
+				if($task->enabledReal() !== true || $task->nextExecution() > 0) continue;
+				$tasks[] = $task;
+			}
+			
+			print 'Running Tasks ('.count($tasks).')' . General::CRLF . '----------------' . General::CRLF;
+			foreach($tasks as $index => $task){
+				$start = precision_timer();
+				printf('(%d/%d): %s ', $index+1, count($tasks), $task->name);
+				$task->run();
+				print ' ... complete (' . precision_timer('stop', $start) . ' sec)' . General::CRLF;
+			}
+			
+			print General::CRLF . 'Done!' . General::CRLF;
+		}
+	}
+	
+	return 'RunTasks';
