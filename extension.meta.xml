@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension id="cron" status="experimental" xmlns="http://symphony-cms.com/schemas/extension/1.0">
+	<name>Cron</name>
+	<description>A system for automating Symphony tasks via cron.</description>
+	<repo type="github">https://github.com/symphonists/cron</repo>
+	<url type="discuss">http://symphony-cms.com/discuss/thread/27322/</url>
+	<types>
+		<type>Workflow</type>
+	</types>
+	<authors>
+		<author>
+			<name github="symphonists" symphony="community">Symphony Community</name>
+		</author>
+	</authors>
+	<dependencies>
+		<dependency version="0.3">shell</dependency>
+	</dependencies>
+	<releases>
+		<release version="0.1.1" date="2009-08-18" min="2.0.7" max="2.0.x" />
+	</releases>
+</extension>
