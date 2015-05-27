@@ -88,8 +88,8 @@ final class CronTask
 
         $sql = sprintf(
                 "UPDATE `tbl_cron` SET `last_output` = '%s', `last_executed` = '%s' WHERE `name` = '%s' LIMIT 1",
-                Symphony::Database()->cleanValue($this->last_output),
-                DateTimeObj::get('Y-m-d H:i:s', $this->last_executed),
+                $this->db->cleanValue($this->last_output),
+                \DateTimeObj::get('Y-m-d H:i:s', $this->last_executed),
                 $this->filename
             );
 
@@ -191,7 +191,7 @@ final class CronTask
     {
         return $this->db->query(sprintf(
             "INSERT INTO `tbl_cron` VALUES ('%s', NULL, 1, NULL) ON DUPLICATE KEY UPDATE `enabled` = 1",
-            $this->filename
+            $this->db->cleanValue($this->filename)
         ));
     }
     
@@ -199,7 +199,7 @@ final class CronTask
     {
         return $this->db->query(sprintf(
             "INSERT INTO `tbl_cron` VALUES ('%s', NULL, 0, NULL) ON DUPLICATE KEY UPDATE `enabled` = 0",
-            $this->filename
+            $this->db->cleanValue($this->filename)
         ));
     }
 
@@ -211,7 +211,7 @@ final class CronTask
         
         return $this->db->query(sprintf(
             "DELETE FROM `tbl_cron` WHERE `name` = '%s' LIMIT 1",
-            $this->filename
+            $this->db->cleanValue($this->filename)
         ));
     }
 
@@ -223,7 +223,7 @@ final class CronTask
 
         return $this->db->query(sprintf(
             "INSERT INTO `tbl_cron` VALUES ('%s', NULL, %d, NULL) ON DUPLICATE KEY UPDATE `enabled` = %2\$d",
-            $this->filename,
+            $this->db->cleanValue($this->filename),
             (int)$this->enabled
         ));
     }
