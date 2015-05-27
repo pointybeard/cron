@@ -1,0 +1,23 @@
+{
+    "name": "pointybeard/cron",
+    "version": "1.0",
+    "description": "Commands to expose CRON like functionality via the Symphony Shell extension.",
+    "homepage": "https://github.com/pointybeard/cron",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alistair Kearney",
+            "email": "hi@alistairkearney.com",
+            "homepage": "http://alistairkearney.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+      "issues": "https://github.com/pointybeard/cron/issues",
+      "wiki": "https://github.com/pointybeard/cron/wiki"
+    },
+    "minimum-stability": "stable",
+    "autoload": {
+      "classmap": ["Lib"]
+    }
+}
