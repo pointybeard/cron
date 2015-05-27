@@ -1,42 +1,49 @@
-Symphony Cron
-------------------------------------
+# Cron
 
-Version: 1.0 (alpha)
-Author: Alistair Kearney (hi@alistairkearney.com)
-Build Date: 26th May 2015
-Requirements: Symphony 2.6.x or greater. Shell extension v1.0.1 or greater
+- Version: 1.0
+- Author: Alistair Kearney
+- Release Date: 26th May 2015
+- Requirements: Symphony 2.6.x, Shell Extension 1.0.1 (https://github.com/pointybeard/shell)
 
 A system for automating tasks via the Symphony shell extension and cron.
 
-[INSTALLATION]
+## Installation and Setup
 
-1. Upload the 'cron' folder in this archive to your Symphony 'extensions' folder.
+1.	Ensure that the [Symphony Shell extension](https://github.com/pointybeard/shell) has been installed first.
 
-2. Enable it by selecting the "Cron", choose Enable from the with-selected menu, then click Apply.
+2.	Upload the 'cron' folder to your Symphony 'extensions' folder.
 
-3. Create a crontab entry (crontab -e) that executes the command "symphony -t XXX cron run-tasks"
+3.	Create a folder called 'cron' inside `/manifest`. Ensure that it is writable by PHP
 
+2.	Enable it by selecting the "Cron", choose Enable from the with-selected menu, then click Apply.
 
-[USAGE]
-
-	Use the 'Cron' interface in the Admin, found under the 'System' menu. Newly created jobs
-	are stored in /manifest/cron, making them suitable for version control.
+3. (Optiona) Create a crontab entry (crontab -e) that executes the command "symphony -t XXX -e cron -c runTasks"
 
 
-	Creating tasks manually
-	===
-	
-		- Create a file with a unique name and place it in /manifest/cron
-		- The XML format is as follows:
+##Usage
 
-			<task>
-				<command>ls -lah</command>
-				<name>I am a nice name</name>
-				<description>I am an optional description</description>
-				<interval type="minute|hour|day|week">45</interval>
-				<start>2009-08-21 07:45am</start>
-				<finish>2009-09-13 1215</finish>
-			</task>
-		
-		- Browse to System > Cron in the Symphony Administration
-		- Enable the newly created Cron task
+Use the 'Cron' interface in the Admin, found under the 'System' menu to create and edit tasks. Newly created tasks are stored in `/manifest/cron`, making them suitable for version control.
+
+Anytime the `runTasks` command is executed via the command line, all pending tasks (those due for execution) will be run. This process can be automated with an entry in your server's `crontab`.
+
+It is also possible to create tasks manually.
+
+## Creating a task manually
+
+1. Create a file with a unique name (???.task) and place it in `/manifest/cron`
+
+2. The contents must be XML and is formatted as follows:
+
+```xml
+	<task>
+		<command>ls -lah</command>
+		<name>I am a nice name</name>
+		<description>I am an optional description</description>
+		<interval type="minute|hour|day|week">45</interval>
+		<start>2009-08-21 07:45am</start>
+		<finish>2009-09-13 1215</finish>
+	</task>
+```
+3. Browse to `System > Cron` in the Symphony Administration
+
+4. Enable the newly created Cron task
