@@ -14,43 +14,30 @@ use Cron\Lib;
             
             $task = (new Lib\CronTask(Symphony::Database()))
                 ->load(realpath(MANIFEST.'/cron') . '/' . $this->_context[0]);
-            
-            //$formHasErrors = (is_array($this->_errors) && !empty($this->_errors));
-            //if ($formHasErrors) {
-            //    $this->pageAlert(__('An error occurred while processing this form. <a href="#error">See below for details.</a>'), Alert::ERROR);
-            //}
-            //
-            //if (isset($this->_context[1])) {
-            //    switch ($this->_context[1]) {
-            //
-            //        case 'saved':
-            //            $this->pageAlert(
-            //                __(
-            //                    'Cron Task updated at %1$s. <a href="%2$s">Create another?</a> <a href="%3$s">View all Cron Tasks</a>',
-            //                    array(
-            //                        DateTimeObj::getTimeAgo(__SYM_TIME_FORMAT__),
-            //                        URL.'/symphony/extension/cron/new/',
-            //                        URL.'/symphony/extension/cron/',
-            //                    )
-            //                ),
-            //                Alert::SUCCESS);
-            //            break;
-            //
-            //        case 'created':
-            //            $this->pageAlert(
-            //                __(
-            //                    'Cron Task created at %1$s. <a href="%2$s">Create another?</a> <a href="%3$s">View all Cron Tasks</a>',
-            //                    array(
-            //                        DateTimeObj::getTimeAgo(__SYM_TIME_FORMAT__),
-            //                        URL.'/symphony/extension/cron/new/',
-            //                        URL.'/symphony/extension/cron/',
-            //                    )
-            //                ),
-            //                Alert::SUCCESS);
-            //            break;
-            //
-            //    }
-            //}
+
+            $formHasErrors = (is_array($this->_errors) && !empty($this->_errors));
+
+            if ($formHasErrors) {
+                $this->pageAlert(
+                    __('An error occurred while processing this form. See below for details.'),
+                    Alert::ERROR
+                );
+
+                // These alerts are only valid if the form doesn't have errors
+            } elseif (isset($this->_context[1])) {
+                $time = Widget::Time();
+
+                switch ($this->_context[1]) {
+                    case 'saved':
+                        $message = __('Cron task updated at %s.', array($time->generate()));
+                        break;
+                        
+                    case 'created':
+                        $message = __('Cron task created at %s.', array($time->generate()));
+                }
+
+                $this->pageAlert($message, Alert::SUCCESS);
+            }
 
             $this->setPageType('form');
             $this->setTitle(__('%1$s &ndash; %2$s &ndash; %3$s', [$task->name, __('Cron'), __('Symphony')]));
@@ -249,7 +236,7 @@ use Cron\Lib;
 
                         redirect(sprintf(
                             "%s/%s/saved/",
-                            Administration::instance()->getCurrentPageURL(),
+                            preg_replace('/cron\/edit.+/', 'cron/edit', Administration::instance()->getCurrentPageURL()),
                             $filename
                         ));
 
@@ -266,7 +253,7 @@ use Cron\Lib;
 
                 General::deleteFile(MANIFEST . '/cron/' . $this->_context[0]);
 
-                redirect(URL.'/symphony/extension/cron/');
+                redirect(preg_replace('/cron\/edit.+/', 'cron/', Administration::instance()->getCurrentPageURL()));
                 return;
             }
         }
