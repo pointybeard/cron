@@ -1,183 +1,172 @@
 <?php
 
-	require_once(TOOLKIT . '/class.administrationpage.php');
+    use Cron\Lib;
 
-	Class contentExtensionCronIndex extends AdministrationPage{
-		
-		private static function __minutesToHumanReadable($minutes){
-			
-			$string = NULL;
-			
-			// WEEKS
-			if($minutes >= (7 * 24 * 60)){
-				$value = floor((float)$minutes * (1 / (7 * 24 * 60)));
-				$string = $value . ' week' . ($value == 1 ? NULL : 's');
-				
-				$minutes -= ($value * 60 * 24 * 7);
-			}
-			
-			// DAYS
-			if($minutes >= (24 * 60)){
-				$value = floor((float)$minutes * (1 / (24 * 60)));
-				$string .= ' ' . $value . ' day' . ($value == 1 ? NULL : 's');
-				
-				$minutes -= ($value * 60 * 24);
-			}
+    class contentExtensionCronIndex extends AdministrationPage
+    {
+        private static function __minutesToHumanReadable($minutes)
+        {
+            $string = null;
 
-			// HOURS
-			if($minutes >= 60){
-				$value = floor((float)$minutes * (1 / 60));
-				$string .= ' ' .  $value . ' hour' . ($value == 1 ? NULL : 's');
-				
-				$minutes -= ($value * 60);
-			}
+            // WEEKS
+            if ($minutes >= (7 * 24 * 60)) {
+                $value = floor((float) $minutes * (1 / (7 * 24 * 60)));
+                $string = $value.' week'.($value == 1 ? null : 's');
 
-			$string .= ' ' . $minutes . ' minute' . ($minutes == 1 ? NULL : 's');
-			
-			return trim($string);
-			
-		}
-		
-		public function view(){
-			$this->setPageType('table');	
-			$this->setTitle('Symphony &ndash; Cron');
+                $minutes -= ($value * 60 * 24 * 7);
+            }
 
-			$this->appendSubheading('Cron Tasks', Widget::Anchor(
-				__('Create New'), $this->_Parent->getCurrentPageURL() . 'new/',
-				'Create a cron task', 'create button'
-			));			
-			
-			
-			$driver = Administration::instance()->ExtensionManager->create('cron');
-			
-			$iterator = new CronTaskIterator(MANIFEST . '/cron');
+            // DAYS
+            if ($minutes >= (24 * 60)) {
+                $value = floor((float) $minutes * (1 / (24 * 60)));
+                $string .= ' '.$value.' day'.($value == 1 ? null : 's');
 
-			$count = 0;
-			foreach($iterator as $c){
-				$count++;
-			}
-			
-			$iterator->rewind();
-			
-			//$this->Form->setAttribute('action', URL . '/symphony/system/extensions/');
+                $minutes -= ($value * 60 * 24);
+            }
 
-			$aTableHead = array(
-				array('Name', 'col'),
-				array('Description', 'col'),				
-				array('Enabled', 'col'),
-				array('Last Executed', 'col'),
-				array('Next Execution', 'col'),
-				array('Last Output', 'col'),
-			);	
+            // HOURS
+            if ($minutes >= 60) {
+                $value = floor((float) $minutes * (1 / 60));
+                $string .= ' '.$value.' hour'.($value == 1 ? null : 's');
 
-			$aTableBody = array();
+                $minutes -= ($value * 60);
+            }
 
-			if($count == 0){
+            $string .= ' '.$minutes.' minute'.($minutes == 1 ? null : 's');
 
-				$aTableBody = array(
-									Widget::TableRow(array(Widget::TableData(__('None found.'), 'inactive', NULL, count($aTableHead))), 'odd')
-								);
-			}
+            return trim($string);
+        }
 
-			else{
-				foreach($iterator as $task){
+        public function view()
+        {
+            $this->setPageType('table');
+            $this->setTitle('Symphony &ndash; Cron');
 
-					$td1 = Widget::TableData(Widget::Anchor($task->name, sprintf('%sedit/%s/', Administration::instance()->getCurrentPageURL(), $task->filename)));
-					
-					$td2 = Widget::TableData((is_null($task->description) ? 'None' : $task->description));
-					if(is_null($task->description)) $td2->setAttribute('class', 'inactive');
+            $this->appendSubheading('Cron Tasks', [
+                Widget::Anchor(
+                    __('Create New'),
+                    Administration::instance()->getCurrentPageURL().'new/',
+                    __('Create a cron task'),
+                    'create button',
+                    null,
+                    ['accesskey' => 'c']
+                )
+            ]);
 
-					$td3 = Widget::TableData(($task->enabledReal() == true ? 'Yes' : 'No'));
-					if($task->enabled == false) $td3->setAttribute('class', 'inactive');
-					
-					$td4 = Widget::TableData(
-						(!is_null($task->last_executed) ? DateTimeObj::get(__SYM_DATETIME_FORMAT__, $task->last_executed): 'Unknown')
-					);
-					if(is_null($task->last_executed)) $td4->setAttribute('class', 'inactive');
+            Extension_Cron::init();
 
-					$td5 = Widget::TableData(
-						(!is_null($task->nextExecution()) ? self::__minutesToHumanReadable(ceil($task->nextExecution() * (1/60))) : 'Unknown')
-					);
-					if(is_null($task->nextExecution()) || $task->enabledReal() == false) $td5->setAttribute('class', 'inactive');
-					
-					if(is_null($task->last_output)){
-						$td6 = Widget::TableData('None', 'inactive');
-					}
-					else{
-						$td6 = Widget::TableData(Widget::Anchor('view', sprintf('%slog/%s/', Administration::instance()->getCurrentPageURL(), $task->filename)));
-					}
-					
-					$td6->appendChild(Widget::Input('items['.$task->filename.']', 'on', 'checkbox'));
-					
-					$aTableBody[] = Widget::TableRow(array($td1, $td2, $td3, $td4, $td5, $td6));
+            $iterator = new Lib\CronTaskIterator(realpath(MANIFEST . '/cron'), Symphony::Database());
 
-				}
-			}
+            $aTableHead = [
+                ['Name', 'col'],
+                ['Description', 'col'],
+                ['Enabled', 'col'],
+                ['Last Executed', 'col'],
+                ['Next Execution', 'col'],
+                ['Last Output', 'col'],
+            ];
 
-			$table = Widget::Table(
-								Widget::TableHead($aTableHead), 
-								NULL, 
-								Widget::TableBody($aTableBody)
-						);
+            $aTableBody = [];
 
-			$this->Form->appendChild($table);
-			
-			$tableActions = new XMLElement('div');
-			$tableActions->setAttribute('class', 'actions');
-			
-			$options = array(
-				array(NULL, false, __('With Selected...')),
-				array('enable', false, __('Enable')),
-				array('disable', false, __('Disable')),
-				array('remove', false, __('Remove'), 'confirm'),
-			);
+            if ($iterator->count() == 0) {
+                $aTableBody = [
+                    Widget::TableRow([
+                        Widget::TableData(__('None found.'), 'inactive', null, count($aTableHead))
+                    ], 'odd')
+                ];
 
-			$tableActions->appendChild(Widget::Select('with-selected', $options));
-			$tableActions->appendChild(Widget::Input('action[apply]', __('Apply'), 'submit'));
-			
-			$this->Form->appendChild($tableActions);			
-			
-			
-		}
+            } else {
+                foreach ($iterator as $ii => $task) {
+                    $td1 = Widget::TableData(Widget::Anchor(
+                        $task->name,
+                        sprintf('%sedit/%s/', Administration::instance()->getCurrentPageURL(), $task->filename)
+                    ));
+                    $td1->appendChild(Widget::Label(__('Select Task %s', [$task->filename]), null, 'accessible', null, array(
+                        'for' => 'task-' . $ii
+                    )));
+                    $td1->appendChild(Widget::Input('items['.$task->filename.']', 'on', 'checkbox', array(
+                        'id' => 'task-' . $ii
+                    )));
 
-		public function action(){
-			$checked = @array_keys($_POST['items']);
+                    $td2 = Widget::TableData((is_null($task->description) ? 'None' : $task->description));
+                    if (is_null($task->description)) {
+                        $td2->setAttribute('class', 'inactive');
+                    }
 
-			if(isset($_POST['with-selected']) && is_array($checked) && !empty($checked)){
+                    $td3 = Widget::TableData(($task->enabledReal() == true ? 'Yes' : 'No'));
+                    if ($task->enabled == false) {
+                        $td3->setAttribute('class', 'inactive');
+                    }
 
-				$action = $_POST['with-selected'];
+                    $td4 = Widget::TableData(
+                        (!is_null($task->getLastExecutionTimestamp()) ? DateTimeObj::get(__SYM_DATETIME_FORMAT__, $task->getLastExecutionTimestamp()) : 'Unknown')
+                    );
+                    if (is_null($task->getLastExecutionTimestamp())) {
+                        $td4->setAttribute('class', 'inactive');
+                    }
 
-				switch($action){
+                    $td5 = Widget::TableData(
+                        (!is_null($task->nextExecution()) ? self::__minutesToHumanReadable(ceil($task->nextExecution() * (1/60))) : 'Unknown')
+                    );
+                    if (is_null($task->nextExecution()) || $task->enabledReal() == false) {
+                        $td5->setAttribute('class', 'inactive');
+                    }
 
-					case 'enable':	
-					
-						foreach($checked as $c){
-							$sql = sprintf("INSERT INTO `tbl_cron` VALUES ('%s', NULL, 1, NULL) ON DUPLICATE KEY UPDATE `enabled` = 1", $c);
-							Symphony::Database()->query($sql);							
-						}
-						
-						break;
+                    if (is_null($task->getLog())) {
+                        $td6 = Widget::TableData('None', 'inactive');
+                    } else {
+                        $td6 = Widget::TableData(Widget::Anchor('view', sprintf('%slog/%s/', Administration::instance()->getCurrentPageURL(), $task->filename)));
+                    }
 
-					case 'disable':		
-						$sql = sprintf("UPDATE `tbl_cron` SET `enabled` = 0 WHERE `name` IN ('%s')", implode("', '", $checked));
-						Symphony::Database()->query($sql);
-						break;
-						
-					case 'remove':		
-						$sql = sprintf("DELETE FROM `tbl_cron` WHERE `name` IN ('%s')", implode("', '", $checked));
-						Symphony::Database()->query($sql);
-						
-						foreach($checked as $c){
-							General::deleteFile(MANIFEST . '/cron/' . $c);
-						}
-						
-						break;						
+                    $aTableBody[] = Widget::TableRow(array($td1, $td2, $td3, $td4, $td5, $td6));
+                }
+            }
 
-				}		
+            $table = Widget::Table(
+                Widget::TableHead($aTableHead),
+                null,
+                Widget::TableBody($aTableBody),
+                'selectable',
+                null,
+                array('role' => 'directory', 'aria-labelledby' => 'symphony-subheading', 'data-interactive' => 'data-interactive')
+            );
+            $this->Form->appendChild($table);
+            
+            $tableActions = new XMLElement('div');
+            $tableActions->setAttribute('class', 'actions');
 
-				redirect(Administration::instance()->getCurrentPageURL());
-			}			
-		}
-	
-	}
-	
+            $options = [
+                [null, false, __('With Selected...')],
+                ['enable', false, __('Enable')],
+                ['disable', false, __('Disable')],
+                ['delete', false, __('Delete'), 'confirm', null, ['data-message' => __('Are you sure you want to delete the selected tasks?')]],
+            ];
+
+            $tableActions->appendChild(Widget::Apply($options));
+            $this->Form->appendChild($tableActions);
+        }
+
+        public function action()
+        {
+            $checked = (
+                isset($_POST['items']) && is_array($_POST['items'])
+                    ? array_keys($_POST['items'])
+                    : []
+            );
+
+            $action = $_POST['with-selected'];
+            
+            // Sanity check! Make sure the selected action is valid
+            if(empty($checked) || !in_array($action, ['delete', 'enable', 'disable'])){
+                return;
+            }
+
+            foreach($checked as $taskFilename){
+                $task = (new Lib\CronTask(Symphony::Database()))
+                    ->load(realpath(MANIFEST.'/cron') . '/' . $taskFilename);
+                $task->$action();
+            }
+
+            redirect(Administration::instance()->getCurrentPageURL());
+        }
+    }
