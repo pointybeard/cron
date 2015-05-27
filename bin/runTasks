@@ -1,0 +1,54 @@
+<?php
+	namespace Shell\Command\Cron;
+    use Shell\Lib\Interfaces\Command as ShellCommand;
+    use Shell\Lib\Shell as Shell;
+    use Cron\Lib;
+        
+    class RunTasks implements ShellCommand
+    {
+		public function usage(){
+			echo "usage: run-tasks [OPTION...]
+	Runs all ready tasks
+
+Examples:
+	... run-tasks
+
+";
+		}
+
+        public function run(array $args = null)
+        {
+            if (!Shell::instance()->isLoggedIn()) {
+                Shell::message("Valid authentication token must be supplied.");
+                exit(1);
+            }
+
+            if (!Shell::Author()->isDeveloper()) {
+                Shell::message("Only developers can run cron related tasks.");
+                exit(1);
+            }
+
+            \Extension_Cron::init();
+
+            $iterator = new Lib\CronTaskIterator(realpath(MANIFEST . '/cron'), Shell::Database());
+
+            $tasks = [];
+
+            foreach ($iterator as $task) {
+                if ($task->enabledReal() !== true || $task->nextExecution() > 0) {
+                    continue;
+                }
+                $tasks[] = $task;
+            }
+
+            print 'Running Tasks ('.count($tasks).')'.PHP_EOL.'----------------'.PHP_EOL;
+            foreach ($tasks as $index => $task) {
+                $start = precision_timer();
+                Shell::message(sprintf('(%d/%d): %s  ... ', $index+1, count($tasks), $task->name), false, false);
+                $task->run();
+               Shell::message('complete ('.precision_timer('stop', $start).' sec)', false, true);
+            }
+
+            Shell::message("All avaialble tasks run. Exiting.");
+        }
+    }
