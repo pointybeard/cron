@@ -15,9 +15,9 @@ A system for automating tasks via the Symphony shell extension and cron.
 
 3.	Create a folder called 'cron' inside `/manifest`. Ensure that it is writable by PHP
 
-2.	Enable it by selecting the "Cron", choose Enable from the with-selected menu, then click Apply.
+2.	Enable it by selecting "Cron", choose Enable from the `with-selected` menu, then click Apply.
 
-3. (Optiona) Create a crontab entry (crontab -e) that executes the command "symphony -t XXX -e cron -c runTasks"
+3. (Optional) Create a crontab entry (crontab -e) that executes the command "symphony -t XXX -e cron -c runTasks"
 
 
 ##Usage
@@ -30,7 +30,7 @@ It is also possible to create tasks manually.
 
 ## Creating a task manually
 
-1. Create a file with a unique name (???.task) and place it in `/manifest/cron`
+1. Create a file with a unique name and extenion of `.task` (e.g. `???.task`) and place it in `/manifest/cron`
 
 2. The contents must be XML and is formatted as follows:
 
