@@ -6,7 +6,7 @@ final class CronTaskIterator implements \Iterator, \Countable
     private $_iterator = null;
     private $count = null;
     private $db = null;
-    
+
     public function __construct($directory, $db)
     {
         $this->db = $db;
@@ -54,13 +54,14 @@ final class CronTaskIterator implements \Iterator, \Countable
     {
         throw new Exception('CronTaskIterator::length() cannot be called.');
     }
-    
+
     public function count()
     {
-        if(is_null($this->count) && $this->_iterator instanceof CronTaskFilterIterator){
+        if (is_null($this->count) && $this->_iterator instanceof CronTaskFilterIterator) {
             $this->count = iterator_count($this->_iterator);
             $this->_iterator->rewind();
         }
+
         return $this->count;
     }
 }

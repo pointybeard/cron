@@ -4,12 +4,11 @@ use Cron\Lib;
 
 class contentExtensionCronNew extends AdministrationPage
 {
-    
-    public function __switchboard($type = 'view'){
+    public function __switchboard($type = 'view')
+    {
         $this->_type = $type;
-        if(!isset($this->_context[0]) || in_array(trim($this->_context[0]), ['', 'saved', 'completed'])){
+        if (!isset($this->_context[0]) || in_array(trim($this->_context[0]), ['', 'saved', 'completed'])) {
             $this->_function = 'index';
-        
         } else {
             $this->_function = $this->_context[0];
         }
@@ -22,7 +21,7 @@ class contentExtensionCronNew extends AdministrationPage
         $this->setTitle(__('%1$s &ndash; %2$s &ndash; %3$s', array(__("New"), __('Cron'), __('Symphony'))));
         $this->appendSubheading(__('Untitled'));
 
-        $formHasErrors = (boolean)(is_array($this->_errors) && !empty($this->_errors));
+        $formHasErrors = (boolean) (is_array($this->_errors) && !empty($this->_errors));
 
         if ($formHasErrors) {
             $this->pageAlert(
@@ -38,7 +37,6 @@ class contentExtensionCronNew extends AdministrationPage
 
         if (!empty($_POST)) {
             $fields = $_POST['fields'];
-
         } else {
             $fields = ['interval' => 60];
         }
@@ -50,17 +48,17 @@ class contentExtensionCronNew extends AdministrationPage
         $label = Widget::Label('Command');
         $label->appendChild(Widget::Input('fields[command]', $fields['command']));
         $fieldset->appendChild((isset($this->_errors['command']) ? Widget::Error($label, $this->_errors['command']) : $label));
-        
+
         $p = new XMLElement('p', '&uarr; This is any command that can be executed from the command line.');
         $p->setAttribute('class', 'help');
         $fieldset->appendChild($p);
-        
+
         $label = Widget::Label('Description <i>Optional</i>');
         $label->appendChild(Widget::Input('fields[description]', $fields['description']));
         $fieldset->appendChild((isset($this->_errors['description']) ? Widget::Error($label, $this->_errors['description']) : $label));
-        
+
         $label = Widget::Label();
-        $input = Widget::Input('fields[interval]', (string)max(1, $fields['interval']), null, array('size' => '6'));
+        $input = Widget::Input('fields[interval]', (string) max(1, $fields['interval']), null, array('size' => '6'));
         $options = [
             ['minute', ($fields['interval'] == 'minute'), 'minutes'],
             ['hour', ($fields['interval'] == 'hour'), 'hours'],
@@ -70,13 +68,13 @@ class contentExtensionCronNew extends AdministrationPage
         $select = Widget::Select('fields[interval-type]', $options, ['class' => 'inline', 'style' => 'display: inline; width: auto;']);
 
         $label->setValue(__('Run this task every %s %s', [$input->generate(false), $select->generate(false)]));
-        
+
         if (isset($this->_errors['interval'])) {
             $fieldset->appendChild(Widget::Error($label, $this->_errors['interval']));
         } else {
             $fieldset->appendChild($label);
         }
-        
+
         $label = Widget::Label();
         $input = Widget::Input('fields[enabled]', 'yes', 'checkbox', (isset($fields['enabled']) ? array('checked' => 'checked') : null));
         $label->setValue(__('%s Enable this task', array($input->generate(false))));
@@ -119,7 +117,7 @@ class contentExtensionCronNew extends AdministrationPage
 
     public function action()
     {
-        if (!array_key_exists('save', $_POST['action']) && !array_key_exists('done', $_POST['action'])){
+        if (!array_key_exists('save', $_POST['action']) && !array_key_exists('done', $_POST['action'])) {
             return;
         }
 
@@ -129,10 +127,9 @@ class contentExtensionCronNew extends AdministrationPage
 
         if (!isset($fields['name']) || strlen(trim($fields['name'])) == 0) {
             $this->_errors['name'] = 'Name is a required field.';
-
         } else {
-            $filename = strtolower(Lang::createFilename($fields['name']. '.task'));
-            $file = realpath(MANIFEST . '/cron') . '/' . $filename;
+            $filename = strtolower(Lang::createFilename($fields['name'].'.task'));
+            $file = realpath(MANIFEST.'/cron').'/'.$filename;
 
             ##Duplicate
             if (file_exists($file)) {
@@ -146,7 +143,6 @@ class contentExtensionCronNew extends AdministrationPage
 
         if (!isset($fields['interval']) || strlen(trim($fields['interval'])) == 0) {
             $this->_errors['interval'] = 'Interval is a required field.';
-
         } elseif (!is_numeric($fields['interval']) || (int) $fields['interval'] == 0) {
             $this->_errors['interval'] = 'Interval must be a positive integer value.';
         }
@@ -168,7 +164,6 @@ class contentExtensionCronNew extends AdministrationPage
 
             if ($time == false || $info === false || !checkdate($info['mon'], $info['mday'], $info['year'])) {
                 $this->_errors['finish'] = 'Finish Date is invalid.';
-
             } elseif (!isset($this->_errors['start']) && isset($fields['start']) && strlen(trim($fields['start'])) > 0) {
                 if (strtotime($fields['finish']) <= strtotime($fields['start'])) {
                     $this->_errors['finish'] = 'Finish Date must occur <strong>after</strong> Start Date.';
@@ -188,9 +183,9 @@ class contentExtensionCronNew extends AdministrationPage
             $task->finish = (strlen(trim($fields['finish'])) > 0 ? strtotime($fields['finish']) : null);
             $task->description = $fields['description'];
             $task->enabled = (isset($fields['enabled']) ? true : false);
-            
-            try{
-                $task->save(function($file, $data){
+
+            try {
+                $task->save(function ($file, $data) {
                     return General::writeFile($file, $data, Symphony::Configuration()->get('write_mode', 'file'));
                 });
 
@@ -199,11 +194,9 @@ class contentExtensionCronNew extends AdministrationPage
                     preg_replace('/new\/$/', '', Administration::instance()->getCurrentPageURL()),
                     $filename
                 ));
-
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 $this->pageAlert($e->getMessage());
             }
         }
-        
     }
 }

@@ -5,15 +5,15 @@ use Cron\Lib;
     {
         public function View()
         {
-            if (!file_exists(realpath(MANIFEST . '/cron') . '/' . $this->_context[0])) {
+            if (!file_exists(realpath(MANIFEST.'/cron').'/'.$this->_context[0])) {
                 throw new SymphonyErrorPage(
-                    'The cron task <code>' . $this->_context[0] . '</code> could not be found.',
+                    'The cron task <code>'.$this->_context[0].'</code> could not be found.',
                     'Task Not Found'
                 );
             }
-            
+
             $task = (new Lib\CronTask(Symphony::Database()))
-                ->load(realpath(MANIFEST.'/cron') . '/' . $this->_context[0]);
+                ->load(realpath(MANIFEST.'/cron').'/'.$this->_context[0]);
 
             $formHasErrors = (is_array($this->_errors) && !empty($this->_errors));
 
@@ -31,7 +31,7 @@ use Cron\Lib;
                     case 'saved':
                         $message = __('Cron task updated at %s.', array($time->generate()));
                         break;
-                        
+
                     case 'created':
                         $message = __('Cron task created at %s.', array($time->generate()));
                 }
@@ -45,7 +45,6 @@ use Cron\Lib;
 
             if (!empty($_POST)) {
                 $fields = $_POST['fields'];
-
             } else {
                 $fields = [
                     'name' => General::sanitize($task->name),
@@ -56,8 +55,8 @@ use Cron\Lib;
                     'start' => (!is_null($task->start) ? DateTimeObj::get('Y-m-d H:i:s', $task->start) : null),
                     'finish' => (!is_null($task->finish) ? DateTimeObj::get('Y-m-d H:i:s', $task->finish) : null),
                 ];
-                
-                if($task->enabled === true){
+
+                if ($task->enabled === true) {
                     $fields['enabled'] = 'yes';
                 }
             }
@@ -66,7 +65,7 @@ use Cron\Lib;
             $fieldset = new XMLElement('fieldset');
             $fieldset->setAttribute('class', 'settings');
             $fieldset->appendChild(new XMLElement('legend', __('Essentials')));
-            
+
             $label = Widget::Label('Name');
             $label->appendChild(Widget::Input('fields[name]', $fields['name']));
             $fieldset->appendChild((isset($this->_errors['name']) ? Widget::Error($label, $this->_errors['name']) : $label));
@@ -74,17 +73,17 @@ use Cron\Lib;
             $label = Widget::Label('Command');
             $label->appendChild(Widget::Input('fields[command]', $fields['command']));
             $fieldset->appendChild((isset($this->_errors['command']) ? Widget::Error($label, $this->_errors['command']) : $label));
-        
+
             $p = new XMLElement('p', '&uarr; This is any command that can be executed from the command line.');
             $p->setAttribute('class', 'help');
             $fieldset->appendChild($p);
-        
+
             $label = Widget::Label('Description <i>Optional</i>');
             $label->appendChild(Widget::Input('fields[description]', $fields['description']));
             $fieldset->appendChild((isset($this->_errors['description']) ? Widget::Error($label, $this->_errors['description']) : $label));
-        
+
             $label = Widget::Label();
-            $input = Widget::Input('fields[interval]', (string)max(1, $fields['interval']), null, array('size' => '6'));
+            $input = Widget::Input('fields[interval]', (string) max(1, $fields['interval']), null, array('size' => '6'));
             $options = [
                 ['minute', ($fields['interval'] == 'minute'), 'minutes'],
                 ['hour', ($fields['interval'] == 'hour'), 'hours'],
@@ -94,13 +93,13 @@ use Cron\Lib;
             $select = Widget::Select('fields[interval-type]', $options, ['class' => 'inline', 'style' => 'display: inline; width: auto;']);
 
             $label->setValue(__('Run this task every %s %s', [$input->generate(false), $select->generate(false)]));
-        
+
             if (isset($this->_errors['interval'])) {
                 $fieldset->appendChild(Widget::Error($label, $this->_errors['interval']));
             } else {
                 $fieldset->appendChild($label);
             }
-        
+
             $label = Widget::Label();
             $input = Widget::Input('fields[enabled]', 'yes', 'checkbox', (isset($fields['enabled']) ? array('checked' => 'checked') : null));
             $label->setValue(__('%s Enable this task', array($input->generate(false))));
@@ -142,7 +141,7 @@ use Cron\Lib;
             $button->setAttributeArray([
                 'name' => 'action[delete]',
                 'class' => 'confirm delete',
-                'title' => 'Delete this task'
+                'title' => 'Delete this task',
             ]);
             $div->appendChild($button);
 
@@ -151,21 +150,19 @@ use Cron\Lib;
 
         public function action()
         {
-            if (array_key_exists('save', $_POST['action']) || array_key_exists('done', $_POST['action'])){
-
+            if (array_key_exists('save', $_POST['action']) || array_key_exists('done', $_POST['action'])) {
                 $fields = $_POST['fields'];
 
                 $this->_errors = array();
 
                 if (!isset($fields['name']) || strlen(trim($fields['name'])) == 0) {
                     $this->_errors['name'] = 'Name is a required field.';
-
                 } else {
-                    $filename = strtolower(Lang::createFilename($fields['name']. '.task'));
-                    $file = realpath(MANIFEST . '/cron') . '/' . $filename;
+                    $filename = strtolower(Lang::createFilename($fields['name'].'.task'));
+                    $file = realpath(MANIFEST.'/cron').'/'.$filename;
 
                     ##Duplicate
-                    if ($file != realpath(MANIFEST . '/cron') . '/' . $this->_context[0] && file_exists($file)) {
+                    if ($file != realpath(MANIFEST.'/cron').'/'.$this->_context[0] && file_exists($file)) {
                         $this->_errors['name'] = __('A task with that name already exists. Please choose another.');
                     }
                 }
@@ -176,7 +173,6 @@ use Cron\Lib;
 
                 if (!isset($fields['interval']) || strlen(trim($fields['interval'])) == 0) {
                     $this->_errors['interval'] = 'Interval is a required field.';
-
                 } elseif (!is_numeric($fields['interval']) || (int) $fields['interval'] == 0) {
                     $this->_errors['interval'] = 'Interval must be a positive integer value.';
                 }
@@ -198,7 +194,6 @@ use Cron\Lib;
 
                     if ($time == false || $info === false || !checkdate($info['mon'], $info['mday'], $info['year'])) {
                         $this->_errors['finish'] = 'Finish Date is invalid.';
-
                     } elseif (!isset($this->_errors['start']) && isset($fields['start']) && strlen(trim($fields['start'])) > 0) {
                         if (strtotime($fields['finish']) <= strtotime($fields['start'])) {
                             $this->_errors['finish'] = 'Finish Date must occur <strong>after</strong> Start Date.';
@@ -219,12 +214,12 @@ use Cron\Lib;
                     $task->description = $fields['description'];
                     $task->enabled = (isset($fields['enabled']) ? true : false);
 
-                    try{
-                        $task->save(function($file, $data){
+                    try {
+                        $task->save(function ($file, $data) {
                             return General::writeFile($file, $data, Symphony::Configuration()->get('write_mode', 'file'));
                         });
 
-                        $oldFile = realpath(MANIFEST . '/cron') . '/' . $this->_context[0];
+                        $oldFile = realpath(MANIFEST.'/cron').'/'.$this->_context[0];
 
                         if ($file != $oldFile) {
                             Symphony::Database()->query(sprintf(
@@ -239,21 +234,19 @@ use Cron\Lib;
                             preg_replace('/cron\/edit.+/', 'cron/edit', Administration::instance()->getCurrentPageURL()),
                             $filename
                         ));
-
-                    } catch(\Exception $e) {
+                    } catch (\Exception $e) {
                         $this->pageAlert($e->getMessage());
                     }
                 }
-
             } elseif (@array_key_exists('delete', $_POST['action'])) {
-
                 Symphony::Database()->query(sprintf(
                     "DELETE FROM `tbl_cron` WHERE `name` = '%s' LIMIT 1", $this->_context[0]
                 ));
 
-                General::deleteFile(MANIFEST . '/cron/' . $this->_context[0]);
+                General::deleteFile(MANIFEST.'/cron/'.$this->_context[0]);
 
                 redirect(preg_replace('/cron\/edit.+/', 'cron/', Administration::instance()->getCurrentPageURL()));
+
                 return;
             }
         }

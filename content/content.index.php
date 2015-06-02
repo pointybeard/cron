@@ -55,7 +55,7 @@
 
             Extension_Cron::init();
 
-            $iterator = new Lib\CronTaskIterator(realpath(MANIFEST . '/cron'), Symphony::Database());
+            $iterator = new Lib\CronTaskIterator(realpath(MANIFEST.'/cron'), Symphony::Database());
 
             $aTableHead = [
                 ['Name', 'col'],
@@ -71,10 +71,9 @@
             if ($iterator->count() == 0) {
                 $aTableBody = [
                     Widget::TableRow([
-                        Widget::TableData(__('None found.'), 'inactive', null, count($aTableHead))
-                    ], 'odd')
+                        Widget::TableData(__('None found.'), 'inactive', null, count($aTableHead)),
+                    ], 'odd'),
                 ];
-
             } else {
                 foreach ($iterator as $ii => $task) {
                     $td1 = Widget::TableData(Widget::Anchor(
@@ -82,10 +81,10 @@
                         sprintf('%sedit/%s/', Administration::instance()->getCurrentPageURL(), $task->filename)
                     ));
                     $td1->appendChild(Widget::Label(__('Select Task %s', [$task->filename]), null, 'accessible', null, array(
-                        'for' => 'task-' . $ii
+                        'for' => 'task-'.$ii,
                     )));
                     $td1->appendChild(Widget::Input('items['.$task->filename.']', 'on', 'checkbox', array(
-                        'id' => 'task-' . $ii
+                        'id' => 'task-'.$ii,
                     )));
 
                     $td2 = Widget::TableData((is_null($task->description) ? 'None' : $task->description));
@@ -131,7 +130,7 @@
                 array('role' => 'directory', 'aria-labelledby' => 'symphony-subheading', 'data-interactive' => 'data-interactive')
             );
             $this->Form->appendChild($table);
-            
+
             $tableActions = new XMLElement('div');
             $tableActions->setAttribute('class', 'actions');
 
@@ -155,15 +154,15 @@
             );
 
             $action = $_POST['with-selected'];
-            
+
             // Sanity check! Make sure the selected action is valid
-            if(empty($checked) || !in_array($action, ['delete', 'enable', 'disable'])){
+            if (empty($checked) || !in_array($action, ['delete', 'enable', 'disable'])) {
                 return;
             }
 
-            foreach($checked as $taskFilename){
+            foreach ($checked as $taskFilename) {
                 $task = (new Lib\CronTask(Symphony::Database()))
-                    ->load(realpath(MANIFEST.'/cron') . '/' . $taskFilename);
+                    ->load(realpath(MANIFEST.'/cron').'/'.$taskFilename);
                 $task->$action();
             }
 

@@ -4,7 +4,7 @@ namespace Cron\Lib;
 final class CronTask
 {
     private $db;
-    
+
     private $_properties = [
         'path' => NULL,
         'filename' => NULL,
@@ -19,10 +19,10 @@ final class CronTask
         'start' => NULL,
         'finish' => NULL,
     ];
-    
-    public function load($path){
 
-        if(!file_exists($path)){
+    public function load($path)
+    {
+        if (!file_exists($path)) {
             throw new \Exception('Task could not be written to `'.$path.'`');
         }
 
@@ -54,26 +54,28 @@ final class CronTask
             "SELECT * FROM `tbl_cron` WHERE `name` = '%s' LIMIT 1",
             $this->filename
         ));
-        
+
         if (is_array($row) && !empty($row)) {
             $this->last_executed = (!is_null($row['last_executed']) ? strtotime($row['last_executed']) : null);
             $this->last_output = $row['last_output'];
             $this->enabled = (bool) $row['enabled'];
         }
-        
+
         return $this;
     }
-    
+
     public function __construct($db)
     {
         $this->db = $db;
     }
 
-    public function getLog(){
+    public function getLog()
+    {
         return $this->last_output;
     }
 
-    public function getLastExecutionTimestamp(){
+    public function getLastExecutionTimestamp()
+    {
         return $this->last_executed;
     }
 
@@ -186,7 +188,7 @@ final class CronTask
     {
         return $this->_properties[$name];
     }
-    
+
     public function enable()
     {
         return $this->db->query(sprintf(
@@ -194,7 +196,7 @@ final class CronTask
             $this->db->cleanValue($this->filename)
         ));
     }
-    
+
     public function disable()
     {
         return $this->db->query(sprintf(
@@ -205,10 +207,10 @@ final class CronTask
 
     public function delete()
     {
-        if(!\General::deleteFile($this->path)){
+        if (!\General::deleteFile($this->path)) {
             throw new \Exception('Task `'.$this->path.'` could not be deleted');
         }
-        
+
         return $this->db->query(sprintf(
             "DELETE FROM `tbl_cron` WHERE `name` = '%s' LIMIT 1",
             $this->db->cleanValue($this->filename)
@@ -217,14 +219,14 @@ final class CronTask
 
     public function save(\Closure $fileWriteFunc)
     {
-        if(!$fileWriteFunc($this->path, (string)$this)){
+        if (!$fileWriteFunc($this->path, (string) $this)) {
             throw new \Exception('Task could not be written to `'.$this->path.'`');
         }
 
         return $this->db->query(sprintf(
             "INSERT INTO `tbl_cron` VALUES ('%s', NULL, %d, NULL) ON DUPLICATE KEY UPDATE `enabled` = %2\$d",
             $this->db->cleanValue($this->filename),
-            (int)$this->enabled
+            (int) $this->enabled
         ));
     }
 }
