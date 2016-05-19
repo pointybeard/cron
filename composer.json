@@ -18,6 +18,8 @@
     },
     "minimum-stability": "stable",
     "autoload": {
-      "classmap": ["Lib"]
+        "psr-4": {
+            "Cron\\Lib\\": "Lib/"
+        }
     }
 }
