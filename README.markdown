@@ -1,9 +1,9 @@
 # Symphony Cron
 
-- Version: 1.0.1
+- Version: 1.0.2
 - Author: Alistair Kearney (hi@alistairkearney.com)
-- Release Date: 28th July 2015
-- Requirements: Symphony 2.6.x, Shell Extension 1.0.2 (https://github.com/pointybeard/shell)
+- Release Date: 20th May 2016
+- Requirements: Symphony 2.6.x, PHP 5.4.* or greater, Shell Extension 1.0.2 (https://github.com/pointybeard/shell)
 
 A system for automating tasks via the Symphony shell extension and cron.
 
