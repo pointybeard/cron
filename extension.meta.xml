@@ -10,14 +10,17 @@
     </types>
     <authors>
         <author>
-            <name github="pointybeard" symphony="team">Alistair Kearney</name>
-            <website>http://alistairkearney.com</website>
+            <name github="pointybeard" symphony="team">Alannah Kearney</name>
+            <website>http://alannahkearney.com</website>
         </author>
     </authors>
     <dependencies>
         <dependency version="1.0.2">shell</dependency>
     </dependencies>
     <releases>
+        <release version="1.0.3" date="2018-09-22" min="2.6">
+            - Shell extension compatibility update
+        </release>
         <release version="1.0.2" date="2016-05-20" min="2.6">
             - Updated README to include PHP 5.4.* or greater as a requirement (Closes #1)
             - Improved the composer.json and committed the vendor folder as it includes the autoloader (Closes #2)

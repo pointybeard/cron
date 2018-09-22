@@ -1,9 +1,10 @@
 # Symphony Cron
 
-- Version: 1.0.2
-- Author: Alistair Kearney (hi@alistairkearney.com)
-- Release Date: 20th May 2016
+- Version: 1.0.3
+- Date: Sept 22 2018
 - Requirements: Symphony 2.6.x, PHP 5.4.* or greater, Shell Extension 1.0.2 (https://github.com/pointybeard/shell)
+- [Release notes](https://github.com/pointybeard/cron/blob/master/CHANGELOG.md)
+- [GitHub repository](https://github.com/pointybeard/cron)
 
 A system for automating tasks via the Symphony shell extension and cron.
 
@@ -30,7 +31,7 @@ It is also possible to create tasks manually.
 
 ## Creating a task manually
 
-1. Create a file with a unique name and extenion of `.task` (e.g. `???.task`) and place it in `/manifest/cron`
+1. Create a file with a unique name and extension of `.task` (e.g. `???.task`) and place it in `/manifest/cron`
 
 2. The contents must be XML and is formatted as follows:
 
