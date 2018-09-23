@@ -21,5 +21,9 @@
         "psr-4": {
             "Cron\\Lib\\": "Lib/"
         }
+    },
+    "require": {
+        "pointybeard/symphony-pdo": "~0.1",
+        "pointybeard/property-bag": "~1.0"
     }
 }
