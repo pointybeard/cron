@@ -12,6 +12,12 @@ class CronTaskFilterIterator extends \FilterIterator
     {
         $current = $this->current();
 
-        return ($current->isDot() || $current->isDir() || substr($current->getFilename(), 0, 1) == '.' ? false : true);
+        return (
+            (
+                $current->isDot() ||
+                $current->isDir() ||
+                substr($current->getFilename(), 0, 1) == '.'
+            ) ? false : true
+        );
     }
 }
