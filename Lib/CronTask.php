@@ -9,7 +9,7 @@ class CronTask extends PropertyBag\Lib\PropertyBag
     const FORCE_EXECUTE_YES = 'yes';
     const FORCE_EXECUTE_NO = 'no';
 
-    const DURATION_MINUTE = "minutes";
+    const DURATION_MINUTE = "minute";
     const DURATION_DAY = "day";
     const DURATION_HOUR= "hour";
     const DURATION_WEEK = "week";
@@ -132,7 +132,7 @@ class CronTask extends PropertyBag\Lib\PropertyBag
     }
 
     public function intervalReal() {
-        $value = (int)$this->interval->value->duration;
+        $value = (int)$this->interval->value->duration->value;
 
         switch ((string)$this->interval->value->type) {
 
