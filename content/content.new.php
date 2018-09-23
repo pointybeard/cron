@@ -172,22 +172,34 @@ class contentExtensionCronNew extends AdministrationPage
         }
 
         if (empty($this->_errors)) {
-            $task = new Lib\CronTask(Symphony::Database());
 
-            $task->path = $file;
-            $task->filename = $filename;
-            $task->name = $fields['name'];
-            $task->command = $fields['command'];
-            $task->setInterval($fields['interval'], $fields['interval-type']);
-            $task->start = (strlen(trim($fields['start'])) > 0 ? strtotime($fields['start']) : null);
-            $task->finish = (strlen(trim($fields['finish'])) > 0 ? strtotime($fields['finish']) : null);
-            $task->description = $fields['description'];
-            $task->enabled = (isset($fields['enabled']) ? true : false);
+            $task = (new Lib\CronTask)
+                ->path($file)
+                ->filename($filename)
+                ->name($fields['name'])
+                ->description($fields['description'])
+                ->setInterval(
+                    $fields['interval'],
+                    $fields['interval-type']
+                )
+                ->command($fields['command'])
+                ->enabled(
+                    (isset($fields['enabled'])
+                    ? Lib\CronTask::ENABLED
+                    : Lib\CronTask::DISABLED)
+                )
+            ;
+
+            if(strlen(trim($fields['start'])) > 0){
+                $task->start(strtotime($fields['start']));
+            }
+
+            if(strlen(trim($fields['finish'])) > 0){
+                $task->finish(strtotime($fields['finish']));
+            }
 
             try {
-                $task->save(function ($file, $data) {
-                    return General::writeFile($file, $data, Symphony::Configuration()->get('write_mode', 'file'));
-                });
+                $task->save();
 
                 redirect(sprintf(
                     "%sedit/%s/created/",
