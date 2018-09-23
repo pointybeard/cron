@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.0] - 2018-09-23
+#### Changed
+- Updated content pages to work with changes to CronTask class
+- Tasks are now saved as JSON instead of XML
+- CronTask extends `pointybeard/property-bag`
+- Database access is handled by `pointybeard/symphony-pdo` instead of passing a database object around
+- Streamlined saving process
+
+#### Added
+- Requies `pointybeard/symphony-pdo` and `pointybeard/property-bag` packages
+- Two new Exceptions to help give context: `LoadingTaskFailedException` and `WritingTaskFailedException`
+- Added 'force' property. This will trigger the task to run once regardless of it's next execution time
+- Several new constants added to `CronTask`
+
 ## [1.0.3] - 2018-09-22
 #### Changed
 - Shell extension compatibility update
@@ -23,6 +37,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 #### Added
 - Initial release
 
+[1.1.0]: https://github.com/pointybeard/cron/compare/1.0.3...1.1.0
 [1.0.3]: https://github.com/pointybeard/cron/compare/1.0.2...1.0.3
 [1.0.2]: https://github.com/pointybeard/cron/compare/1.0.1...1.0.2
 [1.0.1]: https://github.com/pointybeard/cron/compare/1.0.0...1.0.1

@@ -31,12 +31,14 @@ class Extension_Cron extends Extension
 
     public function install()
     {
-        return Symphony::Database()->query("CREATE TABLE IF NOT EXISTS `tbl_cron` (
-          `name` varchar(100) NOT NULL,
-          `last_executed` datetime default NULL,
-          `enabled` tinyint(1) NOT NULL,
-          `last_output` text,
-          PRIMARY KEY (`name`)
-        )");
+        return Symphony::Database()->query("CREATE TABLE `tbl_cron` (
+              `name` varchar(100) NOT NULL,
+              `last_executed` int(14) DEFAULT NULL,
+              `enabled` set('yes','no') NOT NULL DEFAULT '',
+              `last_output` text,
+              `force_execution` set('yes','no') DEFAULT 'no',
+              PRIMARY KEY (`name`)
+            )"
+        );
     }
 }
