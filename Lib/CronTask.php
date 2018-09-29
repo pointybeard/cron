@@ -120,6 +120,7 @@ class CronTask extends PropertyBag\Lib\PropertyBag
         $this
             ->lastOutput(shell_exec((string)$this->command))
             ->lastExecuted(time())
+            ->force(self::FORCE_EXECUTE_NO)
             ->save(self::SAVE_MODE_DATABASE_ONLY)
         ;
     }
