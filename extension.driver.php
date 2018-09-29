@@ -1,8 +1,14 @@
 <?php
 include __DIR__.'/vendor/autoload.php';
 
+use Cron\Lib;
+
 class Extension_Cron extends Extension
 {
+
+    const SORT_ASCENDING = 'asc';
+    const SORT_DESCENDING = 'desc';
+
     private static $_isInit = false;
 
     public function fetchNavigation()
@@ -26,12 +32,12 @@ class Extension_Cron extends Extension
 
     public function uninstall()
     {
-        Symphony::Database()->query("DROP TABLE `tbl_cron`");
+        \Symphony::Database()->query("DROP TABLE `tbl_cron`");
     }
 
     public function install()
     {
-        return Symphony::Database()->query("CREATE TABLE `tbl_cron` (
+        return \Symphony::Database()->query("CREATE TABLE `tbl_cron` (
               `name` varchar(100) NOT NULL,
               `last_executed` int(14) DEFAULT NULL,
               `enabled` set('yes','no') NOT NULL DEFAULT '',
@@ -40,5 +46,26 @@ class Extension_Cron extends Extension
               PRIMARY KEY (`name`)
             )"
         );
+    }
+
+    public static function getSortedTaskList($direction=self::SORT_ASCENDING) {
+        $iterator = new Lib\CronTaskIterator(realpath(MANIFEST . '/cron'));
+
+        $tasks = [];
+
+        if($iterator->count() > 0) {
+            foreach($iterator as $t) {
+                $tasks[(string)$t->filename] = $t;
+            }
+
+            (
+                $direction == self::SORT_ASCENDING
+                    ? ksort($tasks)
+                    : krsort($tasks)
+            );
+
+        }
+
+        return $tasks;
     }
 }

@@ -55,7 +55,7 @@ class contentExtensionCronIndex extends AdministrationPage
 
         Extension_Cron::init();
 
-        $iterator = new Lib\CronTaskIterator(realpath(MANIFEST . '/cron'));
+        $tasks = Extension_Cron::getSortedTaskList(Extension_Cron::SORT_ASCENDING);
 
         $aTableHead = [
             ['Name', 'col'],
@@ -68,14 +68,16 @@ class contentExtensionCronIndex extends AdministrationPage
 
         $aTableBody = [];
 
-        if ($iterator->count() == 0) {
+        if (count($tasks) == 0) {
             $aTableBody = [
                 Widget::TableRow([
                     Widget::TableData(__('None found.'), 'inactive', null, count($aTableHead)),
                 ], 'odd'),
             ];
         } else {
-            foreach ($iterator as $ii => $task) {
+            $ii = -1;
+            foreach ($tasks as $task) {
+                $ii++;
                 $td1 = Widget::TableData(Widget::Anchor(
                     (string)$task->name,
                     sprintf('%sedit/%s/', Administration::instance()->getCurrentPageURL(), (string)$task->filename)
@@ -141,6 +143,7 @@ class contentExtensionCronIndex extends AdministrationPage
             [null, false, __('With Selected...')],
             ['delete', false, __('Delete'), 'confirm', null, ['data-message' => __('Are you sure you want to delete the selected tasks?')]],
             ['force', false, __('Force Execute'), 'confirm', null, ['data-message' => __('Selected tasks will be forced to run during the next Cron Run Tasks event, ignoring their Next Execution time. Are you sure?')]],
+            ['duplicate', false, __('Duplicate')],
             [
                 "label" => "Enabled",
                 "options" => [
@@ -164,54 +167,62 @@ class contentExtensionCronIndex extends AdministrationPage
 
         $action = $_POST['with-selected'];
 
-        // Sanity check! Make sure the selected action is valid
-        if (empty($checked) || !in_array($action, ['force', 'delete', 'enable', 'disable'])) {
-            return;
-        }
-
-        foreach ($checked as $taskFilename) {
-            $task = Lib\CronTask::load(
-                realpath(MANIFEST.'/cron').'/'.$taskFilename
-            );
-
-            try{
-                switch($action) {
-                    case 'enable':
-                        $task
-                            ->enabled(Lib\CronTask::ENABLED)
-                            ->save()
-                        ;
-                        break;
-
-                    case 'disable':
-                        $task
-                            ->enabled(Lib\CronTask::DISABLED)
-                            ->force(Lib\CronTask::FORCE_EXECUTE_NO)
-                            ->save()
-                        ;
-                        break;
-
-                    case 'delete':
-                        $task->delete();
-                        break;
-
-                    case 'force':
-                        $task
-                            ->force(Lib\CronTask::FORCE_EXECUTE_YES)
-                            ->enabled(Lib\CronTask::ENABLED)
-                            ->save()
-                        ;
-                        break;
-                }
-
-            } catch (Exception $ex) {
-                // Failed to save or delete
-                $this->pageAlert(__('There was a problem completing the request action on task "%s": %s', array(
-                        $task->name, $ex->getMessage()
-                    )),
-                    Alert::ERROR
+        if (!empty($checked)) {
+            foreach ($checked as $taskFilename) {
+                $task = Lib\CronTask::load(
+                    realpath(MANIFEST.'/cron').'/'.$taskFilename
                 );
-                return;
+
+                try{
+                    switch($action) {
+                        case 'enable':
+                            $task
+                                ->enabled(Lib\CronTask::ENABLED)
+                                ->save()
+                            ;
+                            break;
+
+                        case 'disable':
+                            $task
+                                ->enabled(Lib\CronTask::DISABLED)
+                                ->force(Lib\CronTask::FORCE_EXECUTE_NO)
+                                ->save()
+                            ;
+                            break;
+
+                        case 'delete':
+                            $task->delete();
+                            break;
+
+                        case 'force':
+                            $task
+                                ->force(Lib\CronTask::FORCE_EXECUTE_YES)
+                                ->enabled(Lib\CronTask::ENABLED)
+                                ->save()
+                            ;
+                            break;
+
+                        case 'duplicate':
+                            $path = preg_replace("@\.task$@", "-copy.task", $task->path);
+                            $task
+                                ->name($task->name() . " Copy")
+                                ->path($path)
+                                ->filename(basename($path))
+                                ->save(Lib\CronTask::SAVE_MODE_FILE_ONLY)
+                            ;
+                            //print "<pre>"; print_r($task); die;
+                            break;
+                    }
+
+                } catch (Exception $ex) {
+                    // Failed to save or delete
+                    $this->pageAlert(__('There was a problem completing the request action on task "%s": %s', array(
+                            $task->name, $ex->getMessage()
+                        )),
+                        Alert::ERROR
+                    );
+                    return;
+                }
             }
         }
 
