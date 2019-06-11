@@ -9,20 +9,20 @@ use pointybeard\PropertyBag;
 
 class Task extends PropertyBag\Lib\PropertyBag
 {
-    const FORCE_EXECUTE_YES = 'yes';
-    const FORCE_EXECUTE_NO = 'no';
+    public const FORCE_EXECUTE_YES = 'yes';
+    public const FORCE_EXECUTE_NO = 'no';
 
-    const DURATION_MINUTE = 'minute';
-    const DURATION_DAY = 'day';
-    const DURATION_HOUR = 'hour';
-    const DURATION_WEEK = 'week';
+    public const DURATION_MINUTE = 'minute';
+    public const DURATION_DAY = 'day';
+    public const DURATION_HOUR = 'hour';
+    public const DURATION_WEEK = 'week';
 
-    const ENABLED = 1;
-    const DISABLED = 0;
+    public const ENABLED = 1;
+    public const DISABLED = 0;
 
-    const SAVE_MODE_DATABASE_ONLY = 0;
-    const SAVE_MODE_FILE_ONLY = 1;
-    const SAVE_MODE_BOTH = 2;
+    public const SAVE_MODE_DATABASE_ONLY = 0;
+    public const SAVE_MODE_FILE_ONLY = 1;
+    public const SAVE_MODE_BOTH = 2;
 
     public function __construct()
     {
@@ -49,7 +49,7 @@ class Task extends PropertyBag\Lib\PropertyBag
         ;
     }
 
-    public static function load($path)
+    public static function load(string $path): self
     {
         $path = realpath($path);
 
@@ -118,7 +118,7 @@ class Task extends PropertyBag\Lib\PropertyBag
         return $this->lastExecuted->value;
     }
 
-    public function run()
+    public function run(): void
     {
         if (true !== $this->enabledReal() || 0 != $this->nextExecution()) {
             return;
@@ -132,7 +132,7 @@ class Task extends PropertyBag\Lib\PropertyBag
         ;
     }
 
-    public function enabledReal()
+    public function enabledReal(): bool
     {
         return
             self::ENABLED == $this->enabled->value &&
@@ -140,7 +140,7 @@ class Task extends PropertyBag\Lib\PropertyBag
         ;
     }
 
-    public function intervalReal()
+    public function intervalReal(): int
     {
         $value = (int) $this->interval->value->duration->value;
 
@@ -161,7 +161,7 @@ class Task extends PropertyBag\Lib\PropertyBag
         return $value;
     }
 
-    public function setInterval($value, $type = self::DURATION_MINUTE)
+    public function setInterval($value, string $type = self::DURATION_MINUTE): self
     {
         $this->interval->value->type = $type;
         $this->interval->value->duration = $value;
@@ -169,7 +169,7 @@ class Task extends PropertyBag\Lib\PropertyBag
         return $this;
     }
 
-    public function nextExecution()
+    public function nextExecution(): ?int
     {
         $nextExecution = null;
 
@@ -195,7 +195,7 @@ class Task extends PropertyBag\Lib\PropertyBag
         return json_encode($this->toArray(), JSON_PRETTY_PRINT);
     }
 
-    public function delete()
+    public function delete(): void
     {
         if (!\General::deleteFile((string) $this->path)) {
             throw new Exceptions\CronException('Task `'.(string) $this->path.'` could not be deleted');
@@ -206,7 +206,7 @@ class Task extends PropertyBag\Lib\PropertyBag
         );
     }
 
-    public function save($saveMode = self::SAVE_MODE_BOTH, \Closure $writeFunction = null)
+    public function save(int $saveMode = self::SAVE_MODE_BOTH, \Closure $writeFunction = null): bool
     {
         // Create a default write function in case one is not provided
         if (null === $writeFunction) {
@@ -259,8 +259,8 @@ class Task extends PropertyBag\Lib\PropertyBag
         unset($data['force']);
 
         if (self::SAVE_MODE_DATABASE_ONLY != $saveMode) {
-            if (false === $writeFunction($this->path, json_encode($data, JSON_PRETTY_PRINT))) {
-                throw new Exceptions\WritingTaskFailedException($this->path);
+            if (false === $writeFunction((string) $this->path, json_encode($data, JSON_PRETTY_PRINT))) {
+                throw new Exceptions\WritingTaskFailedException((string) $this->path);
             }
         }
 

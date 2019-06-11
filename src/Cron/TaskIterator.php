@@ -14,19 +14,19 @@ final class TaskIterator implements \Iterator, \Countable
         $this->iterator = new TaskFilterIterator($directory);
     }
 
-    public function current()
+    public function current(): Task
     {
         return Task::load(
             $this->iterator->current()->getPathname()
         );
     }
 
-    public function innerIterator()
+    public function innerIterator(): TaskFilterIterator
     {
         return $this->iterator;
     }
 
-    public function next()
+    public function next(): void
     {
         $this->iterator->next();
     }
@@ -41,7 +41,7 @@ final class TaskIterator implements \Iterator, \Countable
         return $this->iterator->valid();
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->iterator->rewind();
     }
@@ -56,7 +56,7 @@ final class TaskIterator implements \Iterator, \Countable
         throw new Exceptions\CronException('TaskIterator::length() cannot be called.');
     }
 
-    public function count()
+    public function count(): int
     {
         if (null === $this->count && $this->iterator instanceof TaskFilterIterator) {
             $this->count = iterator_count($this->iterator);

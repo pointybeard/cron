@@ -11,7 +11,7 @@ class TaskFilterIterator extends \FilterIterator
         parent::__construct(new \DirectoryIterator($path));
     }
 
-    public function accept()
+    public function accept(): bool
     {
         $current = $this->current();
 
