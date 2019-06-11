@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension id="cron" status="released" xmlns="http://getsymphony.com/schemas/extension/1.0">
     <name>Cron</name>
-    <description>Commands to expose CRON like functionality via the Symphony Shell extension.</description>
+    <description>Commands to expose CRON-like functionality via the Symphony Console extension.</description>
     <repo type="github">https://github.com/pointybeard/cron</repo>
     <url type="discuss">http://symphony-cms.com/discuss/thread/27322/</url>
     <types>
@@ -15,7 +15,7 @@
         </author>
     </authors>
     <dependencies>
-        <dependency version="1.0.2">shell</dependency>
+        <dependency version="1.0">console</dependency>
     </dependencies>
     <releases>
         <release version="1.1.0" date="2018-09-23" min="2.6">
