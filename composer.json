@@ -18,7 +18,7 @@
     "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
-            "Cron\\Lib\\": "Lib/"
+            "pointybeard\\Symphony\\": "src/"
         }
     },
     "require": {
