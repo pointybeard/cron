@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Symphony\Shell\Command\Cron;
 
 use Symphony\Shell\Lib\AuthenticatedCommand;
@@ -11,40 +13,40 @@ class RunTasks extends AuthenticatedCommand
 {
     use Traits\hasRequiresAuthenticationTrait;
 
-    public function usage(){
-        echo "usage: run-tasks [OPTION...]
+    public function usage()
+    {
+        echo 'usage: run-tasks [OPTION...]
 Runs all ready tasks
 
 Examples:
 ... run-tasks
 
-";
+';
     }
 
     public function run(array $args = null)
     {
-
         if (!Shell::Author()->isDeveloper()) {
-            Shell::message("Only developers can run cron related tasks.");
+            Shell::message('Only developers can run cron related tasks.');
             exit(1);
         }
 
         \Extension_Cron::init();
 
-        $iterator = new Cron\TaskIterator(realpath(MANIFEST . '/cron'), Shell::Database());
+        $iterator = new Cron\TaskIterator(realpath(MANIFEST.'/cron'), Shell::Database());
 
         $tasks = [];
 
         foreach ($iterator as $task) {
-            if ($task->enabledReal() !== true || $task->nextExecution() > 0) {
+            if (true !== $task->enabledReal() || $task->nextExecution() > 0) {
                 continue;
             }
             $tasks[] = $task;
         }
 
-        print
-            'Running Tasks (' . count($tasks) . ')' . PHP_EOL .
-            '----------------' . PHP_EOL
+        echo
+            'Running Tasks ('.count($tasks).')'.PHP_EOL.
+            '----------------'.PHP_EOL
         ;
 
         foreach ($tasks as $index => $task) {
@@ -65,6 +67,6 @@ Examples:
             ), false, true);
         }
 
-        Shell::message("All avaialble tasks run. Exiting.");
+        Shell::message('All avaialble tasks run. Exiting.');
     }
 }

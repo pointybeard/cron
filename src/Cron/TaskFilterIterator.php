@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace pointybeard\Symphony\Extensions\Cron;
 
 class TaskFilterIterator extends \FilterIterator
@@ -12,12 +15,12 @@ class TaskFilterIterator extends \FilterIterator
     {
         $current = $this->current();
 
-        return (
+        return
             (
                 $current->isDot() ||
                 $current->isDir() ||
-                substr($current->getFilename(), 0, 1) == '.'
+                '.' == substr($current->getFilename(), 0, 1)
             ) ? false : true
-        );
+        ;
     }
 }

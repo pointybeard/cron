@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use pointybeard\Symphony\Extensions\Cron;
 
 class contentExtensionCronNew extends AdministrationPage
@@ -18,10 +20,10 @@ class contentExtensionCronNew extends AdministrationPage
     public function __viewIndex()
     {
         $this->setPageType('form');
-        $this->setTitle(__('%1$s &ndash; %2$s &ndash; %3$s', array(__("New"), __('Cron'), __('Symphony'))));
+        $this->setTitle(__('%1$s &ndash; %2$s &ndash; %3$s', array(__('New'), __('Cron'), __('Symphony'))));
         $this->appendSubheading(__('Untitled'));
 
-        $formHasErrors = (boolean) (is_array($this->_errors) && !empty($this->_errors));
+        $formHasErrors = (bool) (is_array($this->_errors) && !empty($this->_errors));
 
         if ($formHasErrors) {
             $this->pageAlert(
@@ -60,10 +62,10 @@ class contentExtensionCronNew extends AdministrationPage
         $label = Widget::Label();
         $input = Widget::Input('fields[interval]', (string) max(1, $fields['interval']), null, array('size' => '6'));
         $options = [
-            ['minute', ($fields['interval'] == 'minute'), 'minutes'],
-            ['hour', ($fields['interval'] == 'hour'), 'hours'],
-            ['day', ($fields['interval'] == 'day'), 'days'],
-            ['week', ($fields['interval'] == 'week'), 'weeks'],
+            ['minute', ('minute' == $fields['interval']), 'minutes'],
+            ['hour', ('hour' == $fields['interval']), 'hours'],
+            ['day', ('day' == $fields['interval']), 'days'],
+            ['week', ('week' == $fields['interval']), 'weeks'],
         ];
         $select = Widget::Select('fields[interval-type]', $options, ['class' => 'inline', 'style' => 'display: inline; width: auto;']);
 
@@ -125,25 +127,25 @@ class contentExtensionCronNew extends AdministrationPage
 
         $this->_errors = array();
 
-        if (!isset($fields['name']) || strlen(trim($fields['name'])) == 0) {
+        if (!isset($fields['name']) || 0 == strlen(trim($fields['name']))) {
             $this->_errors['name'] = 'Name is a required field.';
         } else {
             $filename = strtolower(Lang::createFilename($fields['name'].'.task'));
             $file = realpath(MANIFEST.'/cron').'/'.$filename;
 
-            ##Duplicate
+            //#Duplicate
             if (file_exists($file)) {
                 $this->_errors['name'] = __('A task with that name already exists. Please choose another.');
             }
         }
 
-        if (!isset($fields['command']) || strlen(trim($fields['command'])) == 0) {
+        if (!isset($fields['command']) || 0 == strlen(trim($fields['command']))) {
             $this->_errors['command'] = 'Command is a required field.';
         }
 
-        if (!isset($fields['interval']) || strlen(trim($fields['interval'])) == 0) {
+        if (!isset($fields['interval']) || 0 == strlen(trim($fields['interval']))) {
             $this->_errors['interval'] = 'Interval is a required field.';
-        } elseif (!is_numeric($fields['interval']) || (int) $fields['interval'] == 0) {
+        } elseif (!is_numeric($fields['interval']) || 0 == (int) $fields['interval']) {
             $this->_errors['interval'] = 'Interval must be a positive integer value.';
         }
 
@@ -152,7 +154,7 @@ class contentExtensionCronNew extends AdministrationPage
 
             $info = getdate($time);
 
-            if ($time == false || $info == false || !checkdate($info['mon'], $info['mday'], $info['year'])) {
+            if (false == $time || false == $info || !checkdate($info['mon'], $info['mday'], $info['year'])) {
                 $this->_errors['start'] = 'Start Date is invalid.';
             }
         }
@@ -162,7 +164,7 @@ class contentExtensionCronNew extends AdministrationPage
 
             $info = getdate($time);
 
-            if ($time == false || $info === false || !checkdate($info['mon'], $info['mday'], $info['year'])) {
+            if (false == $time || false === $info || !checkdate($info['mon'], $info['mday'], $info['year'])) {
                 $this->_errors['finish'] = 'Finish Date is invalid.';
             } elseif (!isset($this->_errors['start']) && isset($fields['start']) && strlen(trim($fields['start'])) > 0) {
                 if (strtotime($fields['finish']) <= strtotime($fields['start'])) {
@@ -172,8 +174,7 @@ class contentExtensionCronNew extends AdministrationPage
         }
 
         if (empty($this->_errors)) {
-
-            $task = (new Cron\Task)
+            $task = (new Cron\Task())
                 ->path($file)
                 ->filename($filename)
                 ->name($fields['name'])
@@ -190,11 +191,11 @@ class contentExtensionCronNew extends AdministrationPage
                 )
             ;
 
-            if(strlen(trim($fields['start'])) > 0){
+            if (strlen(trim($fields['start'])) > 0) {
                 $task->start(strtotime($fields['start']));
             }
 
-            if(strlen(trim($fields['finish'])) > 0){
+            if (strlen(trim($fields['finish'])) > 0) {
                 $task->finish(strtotime($fields['finish']));
             }
 
@@ -202,7 +203,7 @@ class contentExtensionCronNew extends AdministrationPage
                 $task->save();
 
                 redirect(sprintf(
-                    "%sedit/%s/created/",
+                    '%sedit/%s/created/',
                     preg_replace('/new\/$/', '', Administration::instance()->getCurrentPageURL()),
                     $filename
                 ));

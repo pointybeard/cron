@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 use pointybeard\Symphony\Extensions\Cron;
 
 class contentExtensionCronEdit extends AdministrationPage
@@ -23,7 +25,7 @@ class contentExtensionCronEdit extends AdministrationPage
                 Alert::ERROR
             );
 
-            // These alerts are only valid if the form doesn't have errors
+        // These alerts are only valid if the form doesn't have errors
         } elseif (isset($this->_context[1])) {
             $time = Widget::Time();
 
@@ -40,23 +42,23 @@ class contentExtensionCronEdit extends AdministrationPage
         }
 
         $this->setPageType('form');
-        $this->setTitle(__('%1$s &ndash; %2$s &ndash; %3$s', [(string)$task->name, __('Cron'), __('Symphony')]));
-        $this->appendSubheading((string)$task->name);
+        $this->setTitle(__('%1$s &ndash; %2$s &ndash; %3$s', [(string) $task->name, __('Cron'), __('Symphony')]));
+        $this->appendSubheading((string) $task->name);
 
         if (!empty($_POST)) {
             $fields = $_POST['fields'];
         } else {
             $fields = [
-                'name' => General::sanitize((string)$task->name),
-                'command' => General::sanitize((string)$task->command),
-                'description' => General::sanitize((string)$task->description),
-                'interval' => (int)$task->interval->value->duration->value,
-                'interval-type' => (string)$task->interval->value->type,
-                'start' => (!is_null($task->start->value) ? DateTimeObj::get('Y-m-d H:i:s', (string)$task->start) : null),
-                'finish' => (!is_null($task->finish->value) ? DateTimeObj::get('Y-m-d H:i:s', (string)$task->finish) : null),
+                'name' => General::sanitize((string) $task->name),
+                'command' => General::sanitize((string) $task->command),
+                'description' => General::sanitize((string) $task->description),
+                'interval' => (int) $task->interval->value->duration->value,
+                'interval-type' => (string) $task->interval->value->type,
+                'start' => (null !== $task->start->value ? DateTimeObj::get('Y-m-d H:i:s', (string) $task->start) : null),
+                'finish' => (null !== $task->finish->value ? DateTimeObj::get('Y-m-d H:i:s', (string) $task->finish) : null),
             ];
 
-            if ($task->enabled->value == Cron\Task::ENABLED) {
+            if (Cron\Task::ENABLED == $task->enabled->value) {
                 $fields['enabled'] = 'yes';
             }
         }
@@ -85,10 +87,10 @@ class contentExtensionCronEdit extends AdministrationPage
         $label = Widget::Label();
         $input = Widget::Input('fields[interval]', (string) max(1, $fields['interval']), null, array('size' => '6'));
         $options = [
-            ['minute', ($fields['interval-type'] == 'minute'), 'minutes'],
-            ['hour', ($fields['interval-type'] == 'hour'), 'hours'],
-            ['day', ($fields['interval-type'] == 'day'), 'days'],
-            ['week', ($fields['interval-type'] == 'week'), 'weeks'],
+            ['minute', ('minute' == $fields['interval-type']), 'minutes'],
+            ['hour', ('hour' == $fields['interval-type']), 'hours'],
+            ['day', ('day' == $fields['interval-type']), 'days'],
+            ['week', ('week' == $fields['interval-type']), 'weeks'],
         ];
         $select = Widget::Select('fields[interval-type]', $options, ['class' => 'inline', 'style' => 'display: inline; width: auto;']);
 
@@ -155,25 +157,25 @@ class contentExtensionCronEdit extends AdministrationPage
 
             $this->_errors = array();
 
-            if (!isset($fields['name']) || strlen(trim($fields['name'])) == 0) {
+            if (!isset($fields['name']) || 0 == strlen(trim($fields['name']))) {
                 $this->_errors['name'] = 'Name is a required field.';
             } else {
                 $filename = strtolower(Lang::createFilename($fields['name'].'.task'));
                 $file = realpath(MANIFEST.'/cron').'/'.$filename;
 
-                ##Duplicate
+                //#Duplicate
                 if ($file != realpath(MANIFEST.'/cron').'/'.$this->_context[0] && file_exists($file)) {
                     $this->_errors['name'] = __('A task with that name already exists. Please choose another.');
                 }
             }
 
-            if (!isset($fields['command']) || strlen(trim($fields['command'])) == 0) {
+            if (!isset($fields['command']) || 0 == strlen(trim($fields['command']))) {
                 $this->_errors['command'] = 'Command is a required field.';
             }
 
-            if (!isset($fields['interval']) || strlen(trim($fields['interval'])) == 0) {
+            if (!isset($fields['interval']) || 0 == strlen(trim($fields['interval']))) {
                 $this->_errors['interval'] = 'Interval is a required field.';
-            } elseif (!is_numeric($fields['interval']) || (int) $fields['interval'] == 0) {
+            } elseif (!is_numeric($fields['interval']) || 0 == (int) $fields['interval']) {
                 $this->_errors['interval'] = 'Interval must be a positive integer value.';
             }
 
@@ -182,7 +184,7 @@ class contentExtensionCronEdit extends AdministrationPage
 
                 $info = getdate($time);
 
-                if ($time == false || $info == false || !checkdate($info['mon'], $info['mday'], $info['year'])) {
+                if (false == $time || false == $info || !checkdate($info['mon'], $info['mday'], $info['year'])) {
                     $this->_errors['start'] = 'Start Date is invalid.';
                 }
             }
@@ -192,7 +194,7 @@ class contentExtensionCronEdit extends AdministrationPage
 
                 $info = getdate($time);
 
-                if ($time == false || $info === false || !checkdate($info['mon'], $info['mday'], $info['year'])) {
+                if (false == $time || false === $info || !checkdate($info['mon'], $info['mday'], $info['year'])) {
                     $this->_errors['finish'] = 'Finish Date is invalid.';
                 } elseif (!isset($this->_errors['start']) && isset($fields['start']) && strlen(trim($fields['start'])) > 0) {
                     if (strtotime($fields['finish']) <= strtotime($fields['start'])) {
@@ -203,9 +205,8 @@ class contentExtensionCronEdit extends AdministrationPage
 
             if (empty($this->_errors)) {
                 try {
-
                     $task = Cron\Task::load(
-                        realpath(MANIFEST.'/cron') . '/' . $this->_context[0]
+                        realpath(MANIFEST.'/cron').'/'.$this->_context[0]
                     );
 
                     $task
@@ -225,11 +226,11 @@ class contentExtensionCronEdit extends AdministrationPage
                         )
                     ;
 
-                    if(strlen(trim($fields['start'])) > 0){
+                    if (strlen(trim($fields['start'])) > 0) {
                         $task->start(strtotime($fields['start']));
                     }
 
-                    if(strlen(trim($fields['finish'])) > 0){
+                    if (strlen(trim($fields['finish'])) > 0) {
                         $task->finish(strtotime($fields['finish']));
                     }
 
@@ -246,17 +247,15 @@ class contentExtensionCronEdit extends AdministrationPage
                     }
 
                     redirect(sprintf(
-                        "%s/%s/saved/",
+                        '%s/%s/saved/',
                         preg_replace('/cron\/edit.+/', 'cron/edit', Administration::instance()->getCurrentPageURL()),
                         $filename
                     ));
-
                 } catch (\Exception $e) {
                     $this->pageAlert($e->getMessage());
                 }
             }
         } elseif (@array_key_exists('delete', $_POST['action'])) {
-
             Cron\Task::load(
                 realpath(MANIFEST.'/cron').'/'.$this->_context[0]
             )->delete();

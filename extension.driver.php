@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 include __DIR__.'/vendor/autoload.php';
 
 use pointybeard\Symphony\Extensions\Cron;
@@ -25,12 +27,13 @@ class Extension_Cron extends Extension
 
     public function uninstall()
     {
-        \Symphony::Database()->query("DROP TABLE `tbl_cron`");
+        \Symphony::Database()->query('DROP TABLE `tbl_cron`');
     }
 
     public function install()
     {
-        return \Symphony::Database()->query("CREATE TABLE `tbl_cron` (
+        return \Symphony::Database()->query(
+            "CREATE TABLE `tbl_cron` (
               `name` varchar(100) NOT NULL,
               `last_executed` int(14) DEFAULT NULL,
               `enabled` set('yes','no') NOT NULL DEFAULT '',
@@ -41,22 +44,22 @@ class Extension_Cron extends Extension
         );
     }
 
-    public static function getSortedTaskList($direction=self::SORT_ASCENDING) {
-        $iterator = new Cron\TaskIterator(realpath(MANIFEST . '/cron'));
+    public static function getSortedTaskList($direction = self::SORT_ASCENDING)
+    {
+        $iterator = new Cron\TaskIterator(realpath(MANIFEST.'/cron'));
 
         $tasks = [];
 
-        if($iterator->count() > 0) {
-            foreach($iterator as $t) {
-                $tasks[(string)$t->filename] = $t;
+        if ($iterator->count() > 0) {
+            foreach ($iterator as $t) {
+                $tasks[(string) $t->filename] = $t;
             }
 
             (
-                $direction == self::SORT_ASCENDING
+                self::SORT_ASCENDING == $direction
                     ? ksort($tasks)
                     : krsort($tasks)
             );
-
         }
 
         return $tasks;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
     use pointybeard\Symphony\Extensions\Cron;
 
     class contentExtensionCronLog extends AdministrationPage
@@ -14,7 +16,7 @@
             }
 
             header('Content-Type: text/plain');
-            echo "Log for task `".$task->name."`:".PHP_EOL."------------------------------------".PHP_EOL.PHP_EOL;
+            echo 'Log for task `'.$task->name.'`:'.PHP_EOL.'------------------------------------'.PHP_EOL.PHP_EOL;
             echo $task->getLog();
             exit();
         }

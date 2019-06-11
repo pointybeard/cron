@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use pointybeard\Symphony\Extensions\Cron;
 
 class contentExtensionCronIndex extends AdministrationPage
@@ -11,7 +13,7 @@ class contentExtensionCronIndex extends AdministrationPage
         // WEEKS
         if ($minutes >= (7 * 24 * 60)) {
             $value = floor((float) $minutes * (1 / (7 * 24 * 60)));
-            $string = $value.' week'.($value == 1 ? null : 's');
+            $string = $value.' week'.(1 == $value ? null : 's');
 
             $minutes -= ($value * 60 * 24 * 7);
         }
@@ -19,7 +21,7 @@ class contentExtensionCronIndex extends AdministrationPage
         // DAYS
         if ($minutes >= (24 * 60)) {
             $value = floor((float) $minutes * (1 / (24 * 60)));
-            $string .= ' '.$value.' day'.($value == 1 ? null : 's');
+            $string .= ' '.$value.' day'.(1 == $value ? null : 's');
 
             $minutes -= ($value * 60 * 24);
         }
@@ -27,12 +29,12 @@ class contentExtensionCronIndex extends AdministrationPage
         // HOURS
         if ($minutes >= 60) {
             $value = floor((float) $minutes * (1 / 60));
-            $string .= ' '.$value.' hour'.($value == 1 ? null : 's');
+            $string .= ' '.$value.' hour'.(1 == $value ? null : 's');
 
             $minutes -= ($value * 60);
         }
 
-        $string .= ' '.$minutes.' minute'.($minutes == 1 ? null : 's');
+        $string .= ' '.$minutes.' minute'.(1 == $minutes ? null : 's');
 
         return trim($string);
     }
@@ -50,7 +52,7 @@ class contentExtensionCronIndex extends AdministrationPage
                 'create button',
                 null,
                 ['accesskey' => 'c']
-            )
+            ),
         ]);
 
         Extension_Cron::init();
@@ -68,7 +70,7 @@ class contentExtensionCronIndex extends AdministrationPage
 
         $aTableBody = [];
 
-        if (count($tasks) == 0) {
+        if (0 == count($tasks)) {
             $aTableBody = [
                 Widget::TableRow([
                     Widget::TableData(__('None found.'), 'inactive', null, count($aTableHead)),
@@ -77,49 +79,49 @@ class contentExtensionCronIndex extends AdministrationPage
         } else {
             $ii = -1;
             foreach ($tasks as $task) {
-                $ii++;
+                ++$ii;
                 $td1 = Widget::TableData(Widget::Anchor(
-                    (string)$task->name,
-                    sprintf('%sedit/%s/', Administration::instance()->getCurrentPageURL(), (string)$task->filename)
+                    (string) $task->name,
+                    sprintf('%sedit/%s/', Administration::instance()->getCurrentPageURL(), (string) $task->filename)
                 ));
-                $td1->appendChild(Widget::Label(__('Select Task %s', [(string)$task->filename]), null, 'accessible', null, array(
+                $td1->appendChild(Widget::Label(__('Select Task %s', [(string) $task->filename]), null, 'accessible', null, array(
                     'for' => 'task-'.$ii,
                 )));
-                $td1->appendChild(Widget::Input('items['.(string)$task->filename.']', 'on', 'checkbox', array(
+                $td1->appendChild(Widget::Input('items['.(string) $task->filename.']', 'on', 'checkbox', array(
                     'id' => 'task-'.$ii,
                 )));
 
-                $td2 = Widget::TableData(strlen(trim((string)$task->description)) <= 0 ? 'None' : (string)$task->description);
-                if (strlen(trim((string)$task->description)) <= 0) {
+                $td2 = Widget::TableData(strlen(trim((string) $task->description)) <= 0 ? 'None' : (string) $task->description);
+                if (strlen(trim((string) $task->description)) <= 0) {
                     $td2->setAttribute('class', 'inactive');
                 }
 
-                $td3 = Widget::TableData(($task->enabledReal() == true ? 'Yes' : 'No'));
+                $td3 = Widget::TableData((true == $task->enabledReal() ? 'Yes' : 'No'));
 
                 $td4 = Widget::TableData(
-                    (!is_null($task->getLastExecutionTimestamp()) ? DateTimeObj::get(__SYM_DATETIME_FORMAT__, $task->getLastExecutionTimestamp()) : 'Unknown')
+                    (null !== $task->getLastExecutionTimestamp() ? DateTimeObj::get(__SYM_DATETIME_FORMAT__, $task->getLastExecutionTimestamp()) : 'Unknown')
                 );
-                if (is_null($task->getLastExecutionTimestamp())) {
+                if (null === $task->getLastExecutionTimestamp()) {
                     $td4->setAttribute('class', 'inactive');
                 }
 
-                $nextExecutionTime = (!is_null($task->nextExecution()) ? self::__minutesToHumanReadable(ceil($task->nextExecution() * (1/60))) : 'None');
+                $nextExecutionTime = (null !== $task->nextExecution() ? self::__minutesToHumanReadable(ceil($task->nextExecution() * (1 / 60))) : 'None');
 
-                if((string)$task->force == Cron\Task::FORCE_EXECUTE_YES) {
-                    $nextExecutionTime .= " (forced)";
+                if (Cron\Task::FORCE_EXECUTE_YES == (string) $task->force) {
+                    $nextExecutionTime .= ' (forced)';
                 }
 
                 $td5 = Widget::TableData(
                     $nextExecutionTime
                 );
-                if (is_null($task->nextExecution()) || $task->enabledReal() == false) {
+                if (null === $task->nextExecution() || false == $task->enabledReal()) {
                     $td5->setAttribute('class', 'inactive');
                 }
 
-                if (is_null($task->getLog())) {
+                if (null === $task->getLog()) {
                     $td6 = Widget::TableData('None', 'inactive');
                 } else {
-                    $td6 = Widget::TableData(Widget::Anchor('view', sprintf('%slog/%s/', Administration::instance()->getCurrentPageURL(), (string)$task->filename)));
+                    $td6 = Widget::TableData(Widget::Anchor('view', sprintf('%slog/%s/', Administration::instance()->getCurrentPageURL(), (string) $task->filename)));
                 }
 
                 $aTableBody[] = Widget::TableRow(array($td1, $td2, $td3, $td4, $td5, $td6));
@@ -145,11 +147,11 @@ class contentExtensionCronIndex extends AdministrationPage
             ['force', false, __('Force Execute'), 'confirm', null, ['data-message' => __('Selected tasks will be forced to run during the next Cron Run Tasks event, ignoring their Next Execution time. Are you sure?')]],
             ['duplicate', false, __('Duplicate')],
             [
-                "label" => "Enabled",
-                "options" => [
+                'label' => 'Enabled',
+                'options' => [
                     ['enable', false, 'Yes'],
-                    ['disable', false, 'No', 'confirm', null, ['data-message' => __('Are you sure you want to disable the selected tasks?')]]
-                ]
+                    ['disable', false, 'No', 'confirm', null, ['data-message' => __('Are you sure you want to disable the selected tasks?')]],
+                ],
             ],
         ];
 
@@ -173,8 +175,8 @@ class contentExtensionCronIndex extends AdministrationPage
                     realpath(MANIFEST.'/cron').'/'.$taskFilename
                 );
 
-                try{
-                    switch($action) {
+                try {
+                    switch ($action) {
                         case 'enable':
                             $task
                                 ->enabled(Cron\Task::ENABLED)
@@ -203,9 +205,9 @@ class contentExtensionCronIndex extends AdministrationPage
                             break;
 
                         case 'duplicate':
-                            $path = preg_replace("@\.task$@", "-copy.task", $task->path);
+                            $path = preg_replace("@\.task$@", '-copy.task', $task->path);
                             $task
-                                ->name($task->name() . " Copy")
+                                ->name($task->name().' Copy')
                                 ->path($path)
                                 ->filename(basename($path))
                                 ->save(Cron\Task::SAVE_MODE_FILE_ONLY)
@@ -213,14 +215,15 @@ class contentExtensionCronIndex extends AdministrationPage
                             //print "<pre>"; print_r($task); die;
                             break;
                     }
-
                 } catch (Exception $ex) {
                     // Failed to save or delete
-                    $this->pageAlert(__('There was a problem completing the request action on task "%s": %s', array(
-                            $task->name, $ex->getMessage()
+                    $this->pageAlert(
+                        __('There was a problem completing the request action on task "%s": %s', array(
+                            $task->name, $ex->getMessage(),
                         )),
                         Alert::ERROR
                     );
+
                     return;
                 }
             }

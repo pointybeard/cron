@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace pointybeard\Symphony\Extensions\Cron;
 
 final class TaskIterator implements \Iterator, \Countable
@@ -55,7 +58,7 @@ final class TaskIterator implements \Iterator, \Countable
 
     public function count()
     {
-        if (is_null($this->count) && $this->iterator instanceof TaskFilterIterator) {
+        if (null === $this->count && $this->iterator instanceof TaskFilterIterator) {
             $this->count = iterator_count($this->iterator);
             $this->iterator->rewind();
         }
