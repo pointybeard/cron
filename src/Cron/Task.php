@@ -188,7 +188,7 @@ class Task extends PropertyBag\Lib\PropertyBag
 
     public function delete() {
         if (!\General::deleteFile((string)$this->path)) {
-            throw new \Exception('Task `'.(string)$this->path.'` could not be deleted');
+            throw new Exceptions\CronException('Task `'.(string)$this->path.'` could not be deleted');
         }
         SymphonyPDO\Loader::instance()->delete(
             'tbl_cron', sprintf("`name` = '%s' LIMIT 1", $this->filename)
