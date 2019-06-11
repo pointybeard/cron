@@ -5,11 +5,8 @@ use pointybeard\Symphony\Extensions\Cron;
 
 class Extension_Cron extends Extension
 {
-
     const SORT_ASCENDING = 'asc';
     const SORT_DESCENDING = 'desc';
-
-    private static $_isInit = false;
 
     public function fetchNavigation()
     {
@@ -24,10 +21,6 @@ class Extension_Cron extends Extension
 
     public static function init()
     {
-        if (self::$_isInit === true) {
-            return;
-        }
-        self::$_isInit = true;
     }
 
     public function uninstall()
