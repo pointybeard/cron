@@ -1,7 +1,7 @@
 <?php
 include __DIR__.'/vendor/autoload.php';
 
-use Cron\Lib;
+use pointybeard\Symphony\Extensions\Cron;
 
 class Extension_Cron extends Extension
 {
@@ -49,7 +49,7 @@ class Extension_Cron extends Extension
     }
 
     public static function getSortedTaskList($direction=self::SORT_ASCENDING) {
-        $iterator = new Lib\CronTaskIterator(realpath(MANIFEST . '/cron'));
+        $iterator = new Cron\TaskIterator(realpath(MANIFEST . '/cron'));
 
         $tasks = [];
 

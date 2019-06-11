@@ -1,19 +1,19 @@
 <?php
-namespace Cron\Lib;
+namespace pointybeard\Symphony\Extensions\Cron;
 
-final class CronTaskIterator implements \Iterator, \Countable
+final class TaskIterator implements \Iterator, \Countable
 {
     private $iterator = null;
     private $count = null;
 
     public function __construct($directory)
     {
-        $this->iterator = new CronTaskFilterIterator($directory);
+        $this->iterator = new TaskFilterIterator($directory);
     }
 
     public function current()
     {
-        return CronTask::load(
+        return Task::load(
             $this->iterator->current()->getPathname()
         );
     }
@@ -45,17 +45,17 @@ final class CronTaskIterator implements \Iterator, \Countable
 
     public function position()
     {
-        throw new \Exception('CronTaskIterator::position() cannot be called.');
+        throw new Exceptions\CronException('TaskIterator::position() cannot be called.');
     }
 
     public function length()
     {
-        throw new \Exception('CronTaskIterator::length() cannot be called.');
+        throw new Exceptions\CronException('TaskIterator::length() cannot be called.');
     }
 
     public function count()
     {
-        if (is_null($this->count) && $this->iterator instanceof CronTaskFilterIterator) {
+        if (is_null($this->count) && $this->iterator instanceof TaskFilterIterator) {
             $this->count = iterator_count($this->iterator);
             $this->iterator->rewind();
         }

@@ -1,7 +1,7 @@
 <?php
-namespace Cron\Lib;
+namespace pointybeard\Symphony\Extensions\Cron;
 
-class CronTaskFilterIterator extends \FilterIterator
+class TaskFilterIterator extends \FilterIterator
 {
     public function __construct($path)
     {

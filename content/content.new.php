@@ -1,6 +1,6 @@
 <?php
 
-use Cron\Lib;
+use pointybeard\Symphony\Extensions\Cron;
 
 class contentExtensionCronNew extends AdministrationPage
 {
@@ -173,7 +173,7 @@ class contentExtensionCronNew extends AdministrationPage
 
         if (empty($this->_errors)) {
 
-            $task = (new Lib\CronTask)
+            $task = (new Cron\Task)
                 ->path($file)
                 ->filename($filename)
                 ->name($fields['name'])
@@ -185,8 +185,8 @@ class contentExtensionCronNew extends AdministrationPage
                 ->command($fields['command'])
                 ->enabled(
                     (isset($fields['enabled'])
-                    ? Lib\CronTask::ENABLED
-                    : Lib\CronTask::DISABLED)
+                    ? Cron\Task::ENABLED
+                    : Cron\Task::DISABLED)
                 )
             ;
 

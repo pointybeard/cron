@@ -5,7 +5,7 @@ namespace Symphony\Shell\Command\Cron;
 use Symphony\Shell\Lib\AuthenticatedCommand;
 use Symphony\Shell\Lib\Traits;
 use Symphony\Shell\Lib\Shell as Shell;
-use Cron\Lib;
+use pointybeard\Symphony\Extensions\Cron;
 
 class RunTasks extends AuthenticatedCommand
 {
@@ -31,7 +31,7 @@ Examples:
 
         \Extension_Cron::init();
 
-        $iterator = new Lib\CronTaskIterator(realpath(MANIFEST . '/cron'), Shell::Database());
+        $iterator = new Cron\TaskIterator(realpath(MANIFEST . '/cron'), Shell::Database());
 
         $tasks = [];
 

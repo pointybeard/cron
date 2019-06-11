@@ -1,5 +1,5 @@
 <?php
-use Cron\Lib;
+use pointybeard\Symphony\Extensions\Cron;
 
 class contentExtensionCronEdit extends AdministrationPage
 {
@@ -11,7 +11,7 @@ class contentExtensionCronEdit extends AdministrationPage
                 'Task Not Found'
             );
         }
-        $task = Lib\CronTask::load(
+        $task = Cron\Task::load(
             realpath(MANIFEST.'/cron').'/'.$this->_context[0]
         );
 
@@ -56,7 +56,7 @@ class contentExtensionCronEdit extends AdministrationPage
                 'finish' => (!is_null($task->finish->value) ? DateTimeObj::get('Y-m-d H:i:s', (string)$task->finish) : null),
             ];
 
-            if ($task->enabled->value == Lib\CronTask::ENABLED) {
+            if ($task->enabled->value == Cron\Task::ENABLED) {
                 $fields['enabled'] = 'yes';
             }
         }
@@ -204,7 +204,7 @@ class contentExtensionCronEdit extends AdministrationPage
             if (empty($this->_errors)) {
                 try {
 
-                    $task = Lib\CronTask::load(
+                    $task = Cron\Task::load(
                         realpath(MANIFEST.'/cron') . '/' . $this->_context[0]
                     );
 
@@ -220,8 +220,8 @@ class contentExtensionCronEdit extends AdministrationPage
                         ->command($fields['command'])
                         ->enabled(
                             (isset($fields['enabled'])
-                            ? Lib\CronTask::ENABLED
-                            : Lib\CronTask::DISABLED)
+                            ? Cron\Task::ENABLED
+                            : Cron\Task::DISABLED)
                         )
                     ;
 
@@ -257,7 +257,7 @@ class contentExtensionCronEdit extends AdministrationPage
             }
         } elseif (@array_key_exists('delete', $_POST['action'])) {
 
-            Lib\CronTask::load(
+            Cron\Task::load(
                 realpath(MANIFEST.'/cron').'/'.$this->_context[0]
             )->delete();
 

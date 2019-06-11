@@ -1,6 +1,6 @@
 <?php
 
-use Cron\Lib;
+use pointybeard\Symphony\Extensions\Cron;
 
 class contentExtensionCronIndex extends AdministrationPage
 {
@@ -105,7 +105,7 @@ class contentExtensionCronIndex extends AdministrationPage
 
                 $nextExecutionTime = (!is_null($task->nextExecution()) ? self::__minutesToHumanReadable(ceil($task->nextExecution() * (1/60))) : 'None');
 
-                if((string)$task->force == Lib\CronTask::FORCE_EXECUTE_YES) {
+                if((string)$task->force == Cron\Task::FORCE_EXECUTE_YES) {
                     $nextExecutionTime .= " (forced)";
                 }
 
@@ -169,7 +169,7 @@ class contentExtensionCronIndex extends AdministrationPage
 
         if (!empty($checked)) {
             foreach ($checked as $taskFilename) {
-                $task = Lib\CronTask::load(
+                $task = Cron\Task::load(
                     realpath(MANIFEST.'/cron').'/'.$taskFilename
                 );
 
@@ -177,15 +177,15 @@ class contentExtensionCronIndex extends AdministrationPage
                     switch($action) {
                         case 'enable':
                             $task
-                                ->enabled(Lib\CronTask::ENABLED)
+                                ->enabled(Cron\Task::ENABLED)
                                 ->save()
                             ;
                             break;
 
                         case 'disable':
                             $task
-                                ->enabled(Lib\CronTask::DISABLED)
-                                ->force(Lib\CronTask::FORCE_EXECUTE_NO)
+                                ->enabled(Cron\Task::DISABLED)
+                                ->force(Cron\Task::FORCE_EXECUTE_NO)
                                 ->save()
                             ;
                             break;
@@ -196,8 +196,8 @@ class contentExtensionCronIndex extends AdministrationPage
 
                         case 'force':
                             $task
-                                ->force(Lib\CronTask::FORCE_EXECUTE_YES)
-                                ->enabled(Lib\CronTask::ENABLED)
+                                ->force(Cron\Task::FORCE_EXECUTE_YES)
+                                ->enabled(Cron\Task::ENABLED)
                                 ->save()
                             ;
                             break;
@@ -208,7 +208,7 @@ class contentExtensionCronIndex extends AdministrationPage
                                 ->name($task->name() . " Copy")
                                 ->path($path)
                                 ->filename(basename($path))
-                                ->save(Lib\CronTask::SAVE_MODE_FILE_ONLY)
+                                ->save(Cron\Task::SAVE_MODE_FILE_ONLY)
                             ;
                             //print "<pre>"; print_r($task); die;
                             break;

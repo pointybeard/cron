@@ -19,9 +19,9 @@
     </dependencies>
     <releases>
         <release version="1.1.0" date="2018-09-23" min="2.6">
-            - Updated content pages to work with changes to CronTask class.
+            - Updated content pages to work with changes to Task class.
             - Tasks are now saved as JSON instead of XML.
-            - CronTask extends pointybeard/propert-bag and uses pointybeard/symphony-pdo for database access.
+            - Task extends pointybeard/propert-bag and uses pointybeard/symphony-pdo for database access.
             - Added 'force' property.
             - Streamlined saving process.
             - Updated code formatting for readablity

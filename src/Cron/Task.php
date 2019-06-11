@@ -1,10 +1,10 @@
 <?php
-namespace Cron\Lib;
+namespace pointybeard\Symphony\Extensions\Cron;
 
 use SymphonyPDO;
 use pointybeard\PropertyBag;
 
-class CronTask extends PropertyBag\Lib\PropertyBag
+class Task extends PropertyBag\Lib\PropertyBag
 {
     const FORCE_EXECUTE_YES = 'yes';
     const FORCE_EXECUTE_NO = 'no';

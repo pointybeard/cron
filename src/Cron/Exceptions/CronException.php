@@ -1,6 +1,6 @@
 <?php
 
-namespace Cron\Lib\Exceptions;
+namespace pointybeard\Symphony\Extensions\Cron\Exceptions;
 
 class CronException extends \Exception
 {
