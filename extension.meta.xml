@@ -15,35 +15,16 @@
         </author>
     </authors>
     <dependencies>
-        <dependency version="1.0">console</dependency>
+        <dependency version="1.0.1">console</dependency>
     </dependencies>
     <releases>
-        <release version="1.1.0" date="2018-09-23" min="2.6">
-            - Updated content pages to work with changes to Task class.
-            - Tasks are now saved as JSON instead of XML.
-            - Task extends pointybeard/propert-bag and uses pointybeard/symphony-pdo for database access.
-            - Added 'force' property.
-            - Streamlined saving process.
-            - Updated code formatting for readablity
-            - Requiring pointybeard/symphony-pdo and pointybeard/property-bag packages
-            - Added two new Exceptions to help give context: LoadingTaskFailedException and WritingTaskFailedException
-        </release>
-        <release version="1.0.3" date="2018-09-22" min="2.6">
-            - Shell extension compatibility update
-        </release>
-        <release version="1.0.2" date="2016-05-20" min="2.6">
-            - Updated README to include PHP 5.4.* or greater as a requirement (Closes #1)
-            - Improved the composer.json and committed the vendor folder as it includes the autoloader (Closes #2)
-        </release>
-        <release version="1.0.1" date="2015-07-28" min="2.6">
-            - Maintenance. Cleaned up Readme and meta. Merged changes from symphonists/cron
-        </release>
-        <release version="1.0" date="2015-05-26" min="2.6">
-            - Updated for Symphony 2.6.x
-        </release>
+        <release version="2.0.0" date="2019-06-11" min="2.7" />
+        <release version="1.1.0" date="2018-09-23" min="2.6" />
+        <release version="1.0.3" date="2018-09-22" min="2.6" />
+        <release version="1.0.2" date="2016-05-20" min="2.6" />
+        <release version="1.0.1" date="2015-07-28" min="2.6" />
+        <release version="1.0" date="2015-05-26" min="2.6" />
         <release version="0.1.1" date="2009-08-18" min="2.0.7" max="2.0.x" />
-        <release version="0.1" date="2009-09-21" max="2.0.6">
-            - Initial release
-        </release>
+        <release version="0.1" date="2009-09-21" max="2.0.6" />
     </releases>
 </extension>
