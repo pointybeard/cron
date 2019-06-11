@@ -2,7 +2,7 @@
 
 namespace Cron\Lib\Exceptions;
 
-class LoadingTaskFailedException extends CronException
+class CronException extends \Exception
 {
     public function __construct($path, $message, $code = 0, \Exception $previous = null) {
         parent::__construct(sprintf(

@@ -2,7 +2,7 @@
 
 namespace Cron\Lib\Exceptions;
 
-class WritingTaskFailedException extends \Exception
+class WritingTaskFailedException extends CronException
 {
     public function __construct($path, $code = 0, \Exception $previous = null) {
         parent::__construct(sprintf(
