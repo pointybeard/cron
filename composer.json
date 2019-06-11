@@ -1,7 +1,6 @@
 {
     "name": "pointybeard/cron",
-    "version": "1.0.3",
-    "description": "Commands to expose CRON like functionality via the Symphony Shell extension.",
+    "description": "Commands to expose CRON like functionality via the Symphony CMS Console extension",
     "homepage": "https://github.com/pointybeard/cron",
     "license": "MIT",
     "authors": [
@@ -23,7 +22,9 @@
         }
     },
     "require": {
-        "pointybeard/symphony-pdo": "~0.1",
-        "pointybeard/property-bag": "~1.0"
+        "php": ">=7.2",
+        "pointybeard/symphony-pdo": "~0.1.7.0",
+        "pointybeard/property-bag": "^1.0",
+        "pointybeard/helpers": "~1.2.0"
     }
 }
