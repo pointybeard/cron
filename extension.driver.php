@@ -27,15 +27,24 @@ class Extension_Cron extends Extension
     {
     }
 
+    public function enable()
+    {
+        return $this->install();
+    }
+
     public function uninstall()
     {
-        \Symphony::Database()->query('DROP TABLE `tbl_cron`');
+        \Symphony::Database()->query('DROP TABLE IF EXISTS `tbl_cron`');
     }
 
     public function install()
     {
+        if (!is_dir(MANIFEST.'/cron')) {
+            \General::realiseDirectory(MANIFEST.'/cron', 0777, false);
+        }
+
         return \Symphony::Database()->query(
-            "CREATE TABLE `tbl_cron` (
+            "CREATE TABLE IF NOT EXISTS `tbl_cron` (
               `name` varchar(100) NOT NULL,
               `last_executed` int(14) DEFAULT NULL,
               `enabled` set('yes','no') NOT NULL DEFAULT '',
