@@ -1,7 +1,7 @@
 # Cron Tasks Extension for Symphony CMS
 
 -   Version: 2.0.0
--   Date: June 09 2019
+-   Date: June 12 2019
 -   [Release notes](https://github.com/pointybeard/cron/blob/master/CHANGELOG.md)
 -   [GitHub repository](https://github.com/pointybeard/cron)
 
@@ -13,7 +13,7 @@ This is an extension for Symphony CMS. Add it to your `/extensions` folder in yo
 
 ### Requirements
 
-This extension requires PHP 7.3 or greater. For use with earlier version of PHP, please use v1.1.0 of this extension instead (`git clone -b1.1.0 https://github.com/pointybeard/cron.git`).
+This extension requires PHP 7.3 or greater. For use with earlier version of PHP, please use v1.1.1 of this extension instead (`git clone -b1.1.1 https://github.com/pointybeard/cron.git`).
 
 The [Console Extension for Symphony CMS](https://github.com/pointybeard/console) must also be installed.
 
@@ -22,13 +22,13 @@ This extension depends on the following Composer libraries:
 -   [SymphonyCMS PDO Connector](https://github.com/pointybeard/symphony-pdo)
 -   [PHP Helpers](https://github.com/pointybeard/helpers)
 
-Run `composer install` on the `extension/cron` directory to install all of these.
+Run `composer update` on the `extension/cron` directory to install these.
 
 ### Setup
 
-(Optional) Create a crontab entry (`crontab -e` on most *nix setups) that executes the command `symphony -t xxxx cron tasks run` where `xxxx` is a author login token. E.g. this will run the console tasks command every 1 minute and save the output to `/logs/symphony-cron.log`
+(Optional) Create a crontab entry (`crontab -e` on most *nix setups) that executes the command `symphony -t xxxx cron run` where `xxxx` is a author login token. E.g. this will run the console tasks command every 1 minute and save the output to `/logs/symphony-cron.log`
 
-    */1 * * * * SYMPHONY_DOCROOT=/path/to/symphony /absolute/path/to/console/bin/symphony -- -t e1f8781e cron tasks run >> /logs/symphony-cron.log 2>&1
+    */1 * * * * SYMPHONY_DOCROOT=/path/to/symphony /absolute/path/to/console/bin/symphony -- -t e1f8781e cron run >> /logs/symphony-cron.log 2>&1
 
 ## Usage
 
@@ -58,6 +58,26 @@ Anytime the `tasks` command is executed via the command-line, all pending tasks 
 3. Browse to `System > Cron` in the Symphony Administration
 
 4. Enable the newly created Cron task
+
+## Running Tasks
+
+This extension provides a new command called 'run'. It can be executed with the Console extension on the command-line like so (this assumes you have correctly installed the [Console Extension for Symphony CMS](https://github.com/pointybeard/console) and followed the 'Optional Setup' steps):
+
+    symphony --user=USER cron run
+
+You must authenticate to run the command, so use either `--user` or `--token`.
+
+The output from the `run` command will look something like this:
+
+Running Tasks (2 task/s found)
+(1/2): Another Test  ... done (time: 2.03 seconds, memory: 4.00 mb)
+(2/2): Test Task  ... done (time: 2.05 seconds, memory: 4.00 mb)
+
+The `run` command has 2 additional options you can use: `--force` and `--task=NAME`.
+
+`--force` will, unsurprisingly, force all tasks to be run regardless of their next execution time or enabled status. `--task=NAME` allows you to run a specific task by name specifying its name. Note that both `--force` and `--task` can be used at the same time. e.g.
+
+    symphony --token=12345 cron run --force --task=mytask.task
 
 ## Support
 
