@@ -69,9 +69,9 @@ You must authenticate to run the command, so use either `--user` or `--token`.
 
 The output from the `run` command will look something like this:
 
-Running Tasks (2 task/s found)
-(1/2): Another Test  ... done (time: 2.03 seconds, memory: 4.00 mb)
-(2/2): Test Task  ... done (time: 2.05 seconds, memory: 4.00 mb)
+    Running Tasks (2 task/s found)
+    (1/2): Another Test  ... done (time: 2.03 seconds, memory: 4.00 mb)
+    (2/2): Test Task  ... done (time: 2.05 seconds, memory: 4.00 mb)
 
 The `run` command has 2 additional options you can use: `--force` and `--task=NAME`.
 
