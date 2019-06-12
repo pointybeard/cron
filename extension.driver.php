@@ -5,6 +5,8 @@ include __DIR__.'/vendor/autoload.php';
 
 use pointybeard\Symphony\Extensions\Cron;
 
+define_safe('CRON_PATH', MANIFEST.'/cron');
+
 class Extension_Cron extends Extension
 {
     const SORT_ASCENDING = 'asc';
