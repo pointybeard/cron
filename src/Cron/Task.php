@@ -6,6 +6,7 @@ namespace pointybeard\Symphony\Extensions\Cron;
 
 use SymphonyPDO;
 use pointybeard\PropertyBag;
+use pointybeard\Helpers\Functions\Json;
 
 class Task extends PropertyBag\Lib\PropertyBag
 {
@@ -20,9 +21,9 @@ class Task extends PropertyBag\Lib\PropertyBag
     public const ENABLED = 1;
     public const DISABLED = 0;
 
-    public const SAVE_MODE_DATABASE_ONLY = 0;
-    public const SAVE_MODE_FILE_ONLY = 1;
-    public const SAVE_MODE_BOTH = 2;
+    public const SAVE_MODE_DATABASE_ONLY = 0x0001;
+    public const SAVE_MODE_FILE_ONLY = 0x0002;
+    public const SAVE_MODE_BOTH = 0x0004;
 
     public function __construct()
     {
@@ -51,19 +52,20 @@ class Task extends PropertyBag\Lib\PropertyBag
 
     public static function load(string $path): self
     {
-        $path = realpath($path);
+        $pathAbsolute = realpath($path);
 
-        if (!file_exists($path) || !is_readable($path)) {
-            throw new Exceptions\LoadingTaskFailedException($path, 'File does not exist or is not readable.');
+        if (false == $pathAbsolute || !is_readable($path)) {
+            throw new Exceptions\LoadingFailedException($path, 'File does not exist or is not readable.');
         }
 
-        $data = json_decode(file_get_contents($path));
-        if (null === $data) {
-            throw new Exceptions\LoadingTaskFailedException($path, 'Task is invalid JSON and cannot be read.');
+        try {
+            $data = Json\json_decode_file($path);
+        } catch (\JsonException $ex) {
+            throw new Exceptions\LoadingFailedException($path, 'Task is not a valid JSON document', 0, $ex);
         }
 
         $task = (new self())
-            ->path($path)
+            ->path($pathAbsolute)
             ->filename(basename($path))
             ->name($data->name)
             ->interval(
@@ -118,18 +120,30 @@ class Task extends PropertyBag\Lib\PropertyBag
         return $this->lastExecuted->value;
     }
 
-    public function run(): void
+    public function run(bool $force = false): void
     {
-        if (true !== $this->enabledReal() || 0 != $this->nextExecution()) {
-            return;
+        if (false == $force && (true !== $this->enabledReal() || 0 != $this->nextExecution())) {
+            throw new Exceptions\FailedToRunException((string) $this->path, 'Not enabled or due to be run yet.');
         }
 
+        $outputLastLine = exec(
+            // Add '2>&1' to the command to make sure errors are redirected
+            // to stdout and therefore captured by $output
+            sprintf('%s 2>&1', (string) $this->command),
+            $output,
+            $return_var
+        );
+
         $this
-            ->lastOutput(shell_exec((string) $this->command))
+            ->lastOutput(implode(PHP_EOL, $output))
             ->lastExecuted(time())
             ->force(self::FORCE_EXECUTE_NO)
             ->save(self::SAVE_MODE_DATABASE_ONLY)
         ;
+
+        if (0 !== $return_var) {
+            throw new Exceptions\FailedToRunException((string) $this->path, $outputLastLine);
+        }
     }
 
     public function enabledReal(): bool
@@ -260,7 +274,7 @@ class Task extends PropertyBag\Lib\PropertyBag
 
         if (self::SAVE_MODE_DATABASE_ONLY != $saveMode) {
             if (false === $writeFunction((string) $this->path, json_encode($data, JSON_PRETTY_PRINT))) {
-                throw new Exceptions\WritingTaskFailedException((string) $this->path);
+                throw new Exceptions\WritingFailedException((string) $this->path);
             }
         }
 
