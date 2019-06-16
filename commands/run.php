@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Symphony\Console\Commands\Cron;
+namespace pointybeard\Symphony\Extensions\Console\Commands\Cron;
 
 use Extension_Cron;
-use Symphony\Console;
+use pointybeard\Symphony\Extensions\Console;
 use pointybeard\Helpers\Cli;
 use pointybeard\Helpers\Cli\Colour\Colour;
 use pointybeard\Symphony\Extensions\Cron;
