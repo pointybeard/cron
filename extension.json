@@ -1,0 +1,77 @@
+{
+    "id": "cron",
+    "name": "Cron",
+    "description": "An extension for automating tasks via the Symphony CMS Console extension.",
+    "repo": "https://github.com/pointybeard/cron.git",
+    "homepage": "https://github.com/pointybeard/cron",
+    "type": [
+        "Utility",
+        "Workflow"
+    ],
+    "authors": [
+        {
+            "name": "Alannah Kearney",
+            "email": "hi@alannahkearney.com",
+            "homepage": "http://alannahkearney.com",
+            "role": "Developer"
+        }
+    ],
+    "require": [
+        "console"
+    ],
+    "releases": [
+        {
+            "version": "2.1.0",
+            "date": "2020-04-17",
+            "min": "2.7.10",
+            "max": "2.7.x"
+        },
+        {
+            "version": "2.0.0",
+            "date": "2019-06-11",
+            "min": "2.7"
+        },
+        {
+            "version": "1.1.0",
+            "date": "2018-09-23",
+            "min": "2.6"
+        },
+        {
+            "version": "1.0.3",
+            "date": "2018-09-22",
+            "min": "2.6"
+        },
+        {
+            "version": "1.0.2",
+            "date": "2016-05-20",
+            "min": "2.6"
+        },
+        {
+            "version": "1.0.1",
+            "date": "2015-07-28",
+            "min": "2.6"
+        },
+        {
+            "version": "1.0",
+            "date": "2015-05-26",
+            "min": "2.6"
+        },
+        {
+            "version": "0.1.1",
+            "date": "2009-08-18",
+            "min": "2.0.7",
+            "max": "2.0.x"
+        },
+        {
+            "version": "0.1",
+            "date": "2009-09-21",
+            "max": "2.0.6"
+        },
+        {
+            "version": "1.0.0",
+            "date": "2020-03-29",
+            "min": "2.7.10",
+            "max": "2.x.x"
+        }
+    ]
+}
