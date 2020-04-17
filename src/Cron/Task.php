@@ -16,11 +16,11 @@ class Task extends PropertyBag\Lib\PropertyBag
     public const FORCE_EXECUTE_YES = 'yes';
     public const FORCE_EXECUTE_NO = 'no';
 
-    public const DURATION_SECOND = "second";
-    public const DURATION_MINUTE = "minute";
-    public const DURATION_DAY = "day";
-    public const DURATION_HOUR= "hour";
-    public const DURATION_WEEK = "week";
+    public const DURATION_SECOND = 'second';
+    public const DURATION_MINUTE = 'minute';
+    public const DURATION_DAY = 'day';
+    public const DURATION_HOUR = 'hour';
+    public const DURATION_WEEK = 'week';
 
     public const ENABLED = 1;
     public const DISABLED = 0;
@@ -134,11 +134,11 @@ class Task extends PropertyBag\Lib\PropertyBag
 
         try {
             Cli\run_command((string) $this->command, $output, $error);
-        } catch(Cli\Exeptions\RunCommandFailedException $ex) {
+        } catch (Cli\Exeptions\RunCommandFailedException $ex) {
             throw new Exceptions\FailedToRunException((string) $this->path, $ex->getError());
         } finally {
             $this
-                ->lastOutput($output . PHP_EOL . $error)
+                ->lastOutput($output.PHP_EOL.$error)
                 ->lastExecuted(time())
                 ->force(self::FORCE_EXECUTE_NO)
                 ->save(self::SAVE_MODE_DATABASE_ONLY)
@@ -176,7 +176,7 @@ class Task extends PropertyBag\Lib\PropertyBag
                 break;
         }
 
-        return (int)$value;
+        return (int) $value;
     }
 
     public function setInterval($value, string $type = self::DURATION_MINUTE): self
@@ -228,9 +228,10 @@ class Task extends PropertyBag\Lib\PropertyBag
     {
         // Create a default write function in case one is not provided
         if (null === $writeFunction) {
-            $writeFunction = function (string $file, string $data, ?string & $error): bool {
-                if(!@file_put_contents($file, $data)) {
-                    $error = "file_put_contents() failed. Check permissions on destination folder " . dirname($file);
+            $writeFunction = function (string $file, string $data, ?string &$error): bool {
+                if (!@file_put_contents($file, $data)) {
+                    $error = 'file_put_contents() failed. Check permissions on destination folder '.dirname($file);
+
                     return false;
                 }
 

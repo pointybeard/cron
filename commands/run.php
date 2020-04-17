@@ -102,6 +102,7 @@ class Run extends Console\AbstractCommand implements Console\Interfaces\Authenti
                     ->message('No tasks ready to run. Nothing to do.')
                     ->foreground(Colour::FG_YELLOW)
             );
+
             return true;
         }
 
@@ -131,7 +132,7 @@ class Run extends Console\AbstractCommand implements Console\Interfaces\Authenti
             );
 
             try {
-                $task->run(true == (bool) $input->find('force') ? Task::FLAG_FORCE : NULL);
+                $task->run(true == (bool) $input->find('force') ? Task::FLAG_FORCE : null);
 
                 $time = Timer::stop();
 
@@ -145,13 +146,12 @@ class Run extends Console\AbstractCommand implements Console\Interfaces\Authenti
                         ))
                         ->foreground(Colour::FG_DEFAULT)
                 );
-
             } catch (\Exception $ex) {
                 $this->broadcast(
                     Symphony::BROADCAST_MESSAGE,
                     E_ERROR,
                     (new Cli\Message\Message())
-                        ->message('failed! Returned: ' . $ex->getMessage())
+                        ->message('failed! Returned: '.$ex->getMessage())
                         ->foreground(Colour::FG_RED)
                 );
             }

@@ -63,11 +63,11 @@ class contentExtensionCronNew extends AdministrationPage
         $input = Widget::Input('fields[interval]', (string) max(1, $fields['interval']), null, array('size' => '6'));
 
         $options = [
-            [Cron\Task::DURATION_SECOND, (Cron\Task::DURATION_SECOND == $fields['interval-type']), Cron\Task::DURATION_SECOND . "s"],
-            [Cron\Task::DURATION_MINUTE, (NULL == $fields['interval-type'] || Cron\Task::DURATION_MINUTE == $fields['interval-type']), Cron\Task::DURATION_MINUTE . "s"],
-            [Cron\Task::DURATION_HOUR, (Cron\Task::DURATION_HOUR == $fields['interval-type']), Cron\Task::DURATION_HOUR . "s"],
-            [Cron\Task::DURATION_DAY, (Cron\Task::DURATION_DAY == $fields['interval-type']), Cron\Task::DURATION_DAY . "s"],
-            [Cron\Task::DURATION_WEEK, (Cron\Task::DURATION_WEEK == $fields['interval-type']), Cron\Task::DURATION_WEEK . "s"],
+            [Cron\Task::DURATION_SECOND, (Cron\Task::DURATION_SECOND == $fields['interval-type']), Cron\Task::DURATION_SECOND.'s'],
+            [Cron\Task::DURATION_MINUTE, (null == $fields['interval-type'] || Cron\Task::DURATION_MINUTE == $fields['interval-type']), Cron\Task::DURATION_MINUTE.'s'],
+            [Cron\Task::DURATION_HOUR, (Cron\Task::DURATION_HOUR == $fields['interval-type']), Cron\Task::DURATION_HOUR.'s'],
+            [Cron\Task::DURATION_DAY, (Cron\Task::DURATION_DAY == $fields['interval-type']), Cron\Task::DURATION_DAY.'s'],
+            [Cron\Task::DURATION_WEEK, (Cron\Task::DURATION_WEEK == $fields['interval-type']), Cron\Task::DURATION_WEEK.'s'],
         ];
         $select = Widget::Select('fields[interval-type]', $options, ['class' => 'inline', 'style' => 'display: inline; width: auto;']);
 
