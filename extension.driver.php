@@ -13,8 +13,14 @@ if (!file_exists(__DIR__.'/vendor/autoload.php')) {
 require_once __DIR__.'/vendor/autoload.php';
 
 use pointybeard\Symphony\Extensions\Cron;
+use pointybeard\Symphony\Extended;
+use pointybeard\Helpers\Functions\Files;
 
-class Extension_Cron extends Extension
+// This file is included automatically in the composer autoloader, however,
+// Symphony might try to include it again which would cause a fatal error.
+// Check if the class already exists before declaring it again.
+if (!class_exists('\\Extension_Cron')) {
+class Extension_Cron extends Extended\AbstractExtension
 {
     const SORT_ASCENDING = 'asc';
     const SORT_DESCENDING = 'desc';
@@ -30,7 +36,7 @@ class Extension_Cron extends Extension
         ];
     }
 
-    public static function init()
+    public function __construct()
     {
         if (false == defined('CRON_PATH')) {
             define('CRON_PATH', MANIFEST.'/cron');
@@ -49,8 +55,12 @@ class Extension_Cron extends Extension
 
     public function install()
     {
-        if (!is_dir(MANIFEST.'/cron')) {
-            \General::realiseDirectory(MANIFEST.'/cron', 0777, false);
+        parent::install();
+
+        try {
+            Files\realise_directory(CRON_PATH);
+        } catch(Files\Exceptions\Directory\AlreadyExistsException $ex) {
+            // Its okay, the cron folder already exists.
         }
 
         return \Symphony::Database()->query(
@@ -85,4 +95,5 @@ class Extension_Cron extends Extension
 
         return $tasks;
     }
+}
 }
