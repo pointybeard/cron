@@ -71,15 +71,13 @@ class Run extends Console\AbstractCommand implements Console\Interfaces\Authenti
     {
         Extension_Cron::init();
 
-        $iterator = new Cron\TaskIterator(
-            realpath(MANIFEST.'/cron')
-        );
+        $iterator = new Cron\TaskIterator(CRON_PATH);
 
         $tasks = [];
 
         foreach ($iterator as $task) {
             // --force is not set and this task isn't due to be executed
-            if (true !== $input->find('force') && (true !== $task->enabledReal() || $task->nextExecution() > 0)) {
+            if (true !== $input->find('force') && false == $this->isReadyToRun()) {
                 continue;
 
             // --task is set and the specified task filename is the same as
