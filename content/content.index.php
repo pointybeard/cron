@@ -3,42 +3,10 @@
 declare(strict_types=1);
 
 use pointybeard\Symphony\Extensions\Cron;
+use pointybeard\Helpers\Functions\Time;
 
 class contentExtensionCronIndex extends AdministrationPage
 {
-    private static function __minutesToHumanReadable($minutes)
-    {
-        $string = null;
-
-        // WEEKS
-        if ($minutes >= (7 * 24 * 60)) {
-            $value = floor((float) $minutes * (1 / (7 * 24 * 60)));
-            $string = $value.' week'.(1 == $value ? null : 's');
-
-            $minutes -= ($value * 60 * 24 * 7);
-        }
-
-        // DAYS
-        if ($minutes >= (24 * 60)) {
-            $value = floor((float) $minutes * (1 / (24 * 60)));
-            $string .= ' '.$value.' day'.(1 == $value ? null : 's');
-
-            $minutes -= ($value * 60 * 24);
-        }
-
-        // HOURS
-        if ($minutes >= 60) {
-            $value = floor((float) $minutes * (1 / 60));
-            $string .= ' '.$value.' hour'.(1 == $value ? null : 's');
-
-            $minutes -= ($value * 60);
-        }
-
-        $string .= ' '.$minutes.' minute'.(1 == $minutes ? null : 's');
-
-        return trim($string);
-    }
-
     public function view()
     {
         $this->setPageType('table');
@@ -105,7 +73,7 @@ class contentExtensionCronIndex extends AdministrationPage
                     $td4->setAttribute('class', 'inactive');
                 }
 
-                $nextExecutionTime = (null !== $task->nextExecution() ? self::__minutesToHumanReadable(ceil($task->nextExecution() * (1 / 60))) : 'None');
+                $nextExecutionTime = (null !== $task->nextExecution() ? Time\human_readable_time($task->nextExecution(), Time\FLAG_PAD_STRING | Time\FLAG_INCLUDE_DAYS | Time\FLAG_INCLUDE_WEEKS | Time\FLAG_INCLUDE_HOURS) : 'None');
 
                 if (Cron\Task::FORCE_EXECUTE_YES == (string) $task->force) {
                     $nextExecutionTime .= ' (forced)';
@@ -212,7 +180,6 @@ class contentExtensionCronIndex extends AdministrationPage
                                 ->filename(basename($path))
                                 ->save(Cron\Task::SAVE_MODE_FILE_ONLY)
                             ;
-                            //print "<pre>"; print_r($task); die;
                             break;
                     }
                 } catch (Exception $ex) {
