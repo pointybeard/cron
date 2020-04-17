@@ -10,9 +10,14 @@ use pointybeard\Helpers\Cli;
 use pointybeard\Helpers\Cli\Colour\Colour;
 use pointybeard\Symphony\Extensions\Cron;
 use SebastianBergmann\Timer\Timer;
+use pointybeard\Symphony\Extensions\Cron\Task;
+use pointybeard\Helpers\Foundation\BroadcastAndListen;
+use pointybeard\Symphony\Extensions\Console\Commands\Console\Symphony;
 
-class Run extends Console\AbstractCommand implements Console\Interfaces\AuthenticatedCommandInterface
+class Run extends Console\AbstractCommand implements Console\Interfaces\AuthenticatedCommandInterface, BroadcastAndListen\Interfaces\AcceptsListenersInterface
 {
+    use BroadcastAndListen\Traits\HasListenerTrait;
+    use BroadcastAndListen\Traits\HasBroadcasterTrait;
     use Console\Traits\hasCommandRequiresAuthenticateTrait;
 
     public function __construct()
@@ -25,7 +30,7 @@ class Run extends Console\AbstractCommand implements Console\Interfaces\Authenti
                 'symphony -t 4141e465 cron run'.PHP_EOL.
                 'symphony -t 4141e465 cron run --task=mytask --force'
             )
-            ->support("If you believe you have found a bug, please report it using the GitHub issue tracker at https://github.com/pointybeard/cron/issues, or better yet, fork the library and submit a pull request.\r\n\r\nCopyright 2019 Alannah Kearney. See ".realpath(__DIR__.'/../LICENCE')." for full software licence information.\r\n")
+            ->support("If you believe you have found a bug, please report it using the GitHub issue tracker at https://github.com/pointybeard/cron/issues, or better yet, fork the library and submit a pull request.\r\n\r\nCopyright 2019-2020 Alannah Kearney. See ".realpath(__DIR__.'/../LICENCE')." for full software licence information.\r\n")
         ;
     }
 
@@ -90,56 +95,65 @@ class Run extends Console\AbstractCommand implements Console\Interfaces\Authenti
         }
 
         if (count($tasks) <= 0) {
-            (new Cli\Message\Message())
-                ->message('No tasks ready to run. Nothing to do.')
-                ->foreground(Colour::FG_YELLOW)
-                ->background(Colour::BG_DEFAULT)
-                ->display()
-            ;
-
+            $this->broadcast(
+                Symphony::BROADCAST_MESSAGE,
+                E_NOTICE,
+                (new Cli\Message\Message())
+                    ->message('No tasks ready to run. Nothing to do.')
+                    ->foreground(Colour::FG_YELLOW)
+            );
             return true;
         }
 
-        (new Cli\Message\Message())
-            ->message(sprintf('Running Tasks (%d task/s found)', count($tasks)))
-            ->foreground(Colour::FG_WHITE)
-            ->background(Colour::BG_BLUE)
-            ->display()
-        ;
+        $this->broadcast(
+            Symphony::BROADCAST_MESSAGE,
+            E_NOTICE,
+            (new Cli\Message\Message())
+                ->message('Running Tasks (%d task/s found)')
+                ->foreground(Colour::FG_DEFAULT)
+        );
 
         foreach ($tasks as $index => $task) {
             Timer::start();
 
-            (new Cli\Message\Message())
-                ->message(sprintf(
-                    '(%d/%d): %s  ... ',
-                    $index + 1,
-                    count($tasks),
-                    $task->name
-                ))
-                ->foreground(Colour::FG_GREEN)
-                ->flags(null)
-                ->display()
-            ;
+            $this->broadcast(
+                Symphony::BROADCAST_MESSAGE,
+                E_NOTICE,
+                (new Cli\Message\Message())
+                    ->message(sprintf(
+                        '(%d/%d): %s  ... ',
+                        $index + 1,
+                        count($tasks),
+                        $task->name
+                    ))
+                    ->foreground(Colour::FG_GREEN)
+                    ->flags(null)
+            );
 
             try {
-                $task->run((bool) $input->find('force'));
+                $task->run(true == (bool) $input->find('force') ? Task::FLAG_FORCE : NULL);
 
                 $time = Timer::stop();
 
-                (new Cli\Message\Message())
-                    ->message(sprintf(
-                        'done (%s)',
-                        strtolower(
-                            Timer::resourceUsage()
-                    )
-                    ))
-                    ->foreground(Colour::FG_DEFAULT)
-                    ->display()
-                ;
+                $this->broadcast(
+                    Symphony::BROADCAST_MESSAGE,
+                    E_NOTICE,
+                    (new Cli\Message\Message())
+                        ->message(sprintf(
+                            'done (%s)',
+                            strtolower(Timer::resourceUsage())
+                        ))
+                        ->foreground(Colour::FG_DEFAULT)
+                );
+
             } catch (\Exception $ex) {
-                echo Colour::colourise('failed!', Colour::FG_RED).PHP_EOL;
-                echo Colour::colourise($ex->getMessage(), Colour::FG_RED).PHP_EOL;
+                $this->broadcast(
+                    Symphony::BROADCAST_MESSAGE,
+                    E_ERROR,
+                    (new Cli\Message\Message())
+                        ->message('failed! Returned: ' . $ex->getMessage())
+                        ->foreground(Colour::FG_RED)
+                );
             }
         }
 
