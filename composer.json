@@ -12,14 +12,16 @@
         }
     ],
     "support": {
-      "issues": "https://github.com/pointybeard/cron/issues",
-      "wiki": "https://github.com/pointybeard/cron/wiki"
+      "issues": "https://github.com/pointybeard/cron/issues"
     },
     "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
             "pointybeard\\Symphony\\Extensions\\": "src/"
-        }
+        },
+        "files": [
+            "extension.driver.php"
+        ]
     },
     "require": {
         "php": ">=7.2",
