@@ -126,9 +126,14 @@ class Task extends PropertyBag\Lib\PropertyBag
         return $this->lastExecuted->value;
     }
 
+    public function isReadyToRun(): bool
+    {
+        return true == $this->enabledReal() && 0 == $this->nextExecution();
+    }
+
     public function run(?int $flags = self::FLAG_FORCE): void
     {
-        if (false == Flags\is_flag_set($flags, self::FLAG_FORCE) && (true !== $this->enabledReal() || 0 != $this->nextExecution())) {
+        if (false == Flags\is_flag_set($flags, self::FLAG_FORCE) && false == $this->isReadyToRun()) {
             throw new Exceptions\FailedToRunException((string) $this->path, 'Not enabled or due to be run yet.');
         }
 
