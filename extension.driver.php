@@ -14,8 +14,6 @@ require_once __DIR__.'/vendor/autoload.php';
 
 use pointybeard\Symphony\Extensions\Cron;
 
-define_safe('CRON_PATH', MANIFEST.'/cron');
-
 class Extension_Cron extends Extension
 {
     const SORT_ASCENDING = 'asc';
@@ -34,6 +32,9 @@ class Extension_Cron extends Extension
 
     public static function init()
     {
+        if (false == defined('CRON_PATH')) {
+            define('CRON_PATH', MANIFEST.'/cron');
+        }
     }
 
     public function enable()
