@@ -20,50 +20,50 @@ use pointybeard\Helpers\Functions\Files;
 // Symphony might try to include it again which would cause a fatal error.
 // Check if the class already exists before declaring it again.
 if (!class_exists('\\Extension_Cron')) {
-class Extension_Cron extends Extended\AbstractExtension
-{
-    const SORT_ASCENDING = 'asc';
-    const SORT_DESCENDING = 'desc';
-
-    public function fetchNavigation()
+    class Extension_Cron extends Extended\AbstractExtension
     {
-        return [
+        const SORT_ASCENDING = 'asc';
+        const SORT_DESCENDING = 'desc';
+
+        public function fetchNavigation()
+        {
+            return [
             [
                 'location' => 'System',
                 'name' => 'Cron',
                 'link' => '/',
             ],
         ];
-    }
-
-    public function __construct()
-    {
-        if (false == defined('CRON_PATH')) {
-            define('CRON_PATH', MANIFEST.'/cron');
-        }
-    }
-
-    public function enable()
-    {
-        return $this->install();
-    }
-
-    public function uninstall()
-    {
-        \Symphony::Database()->query('DROP TABLE IF EXISTS `tbl_cron`');
-    }
-
-    public function install()
-    {
-        parent::install();
-
-        try {
-            Files\realise_directory(CRON_PATH);
-        } catch(Files\Exceptions\Directory\AlreadyExistsException $ex) {
-            // Its okay, the cron folder already exists.
         }
 
-        return \Symphony::Database()->query(
+        public function __construct()
+        {
+            if (false == defined('CRON_PATH')) {
+                define('CRON_PATH', MANIFEST.'/cron');
+            }
+        }
+
+        public function enable()
+        {
+            return $this->install();
+        }
+
+        public function uninstall()
+        {
+            \Symphony::Database()->query('DROP TABLE IF EXISTS `tbl_cron`');
+        }
+
+        public function install()
+        {
+            parent::install();
+
+            try {
+                Files\realise_directory(CRON_PATH);
+            } catch (Files\Exceptions\Directory\AlreadyExistsException $ex) {
+                // Its okay, the cron folder already exists.
+            }
+
+            return \Symphony::Database()->query(
             "CREATE TABLE IF NOT EXISTS `tbl_cron` (
               `name` varchar(100) NOT NULL,
               `last_executed` int(14) DEFAULT NULL,
@@ -73,27 +73,27 @@ class Extension_Cron extends Extended\AbstractExtension
               PRIMARY KEY (`name`)
             )"
         );
-    }
+        }
 
-    public static function getSortedTaskList($direction = self::SORT_ASCENDING)
-    {
-        $iterator = new Cron\TaskIterator(realpath(MANIFEST.'/cron'));
+        public static function getSortedTaskList($direction = self::SORT_ASCENDING)
+        {
+            $iterator = new Cron\TaskIterator(realpath(MANIFEST.'/cron'));
 
-        $tasks = [];
+            $tasks = [];
 
-        if ($iterator->count() > 0) {
-            foreach ($iterator as $t) {
-                $tasks[(string) $t->filename] = $t;
-            }
+            if ($iterator->count() > 0) {
+                foreach ($iterator as $t) {
+                    $tasks[(string) $t->filename] = $t;
+                }
 
             (
                 self::SORT_ASCENDING == $direction
                     ? ksort($tasks)
                     : krsort($tasks)
             );
-        }
+            }
 
-        return $tasks;
+            return $tasks;
+        }
     }
-}
 }
