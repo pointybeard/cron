@@ -7,16 +7,20 @@ namespace pointybeard\Symphony\Extensions\Cron;
 use SymphonyPDO;
 use pointybeard\PropertyBag;
 use pointybeard\Helpers\Functions\Json;
+use pointybeard\Helpers\Functions\Cli;
+use pointybeard\Helpers\Functions\Time;
+use pointybeard\Helpers\Functions\Flags;
 
 class Task extends PropertyBag\Lib\PropertyBag
 {
     public const FORCE_EXECUTE_YES = 'yes';
     public const FORCE_EXECUTE_NO = 'no';
 
-    public const DURATION_MINUTE = 'minute';
-    public const DURATION_DAY = 'day';
-    public const DURATION_HOUR = 'hour';
-    public const DURATION_WEEK = 'week';
+    public const DURATION_SECOND = "second";
+    public const DURATION_MINUTE = "minute";
+    public const DURATION_DAY = "day";
+    public const DURATION_HOUR= "hour";
+    public const DURATION_WEEK = "week";
 
     public const ENABLED = 1;
     public const DISABLED = 0;
@@ -24,6 +28,8 @@ class Task extends PropertyBag\Lib\PropertyBag
     public const SAVE_MODE_DATABASE_ONLY = 0x0001;
     public const SAVE_MODE_FILE_ONLY = 0x0002;
     public const SAVE_MODE_BOTH = 0x0004;
+
+    public const FLAG_FORCE = 0x0008;
 
     public function __construct()
     {
@@ -120,29 +126,23 @@ class Task extends PropertyBag\Lib\PropertyBag
         return $this->lastExecuted->value;
     }
 
-    public function run(bool $force = false): void
+    public function run(?int $flags = self::FLAG_FORCE): void
     {
-        if (false == $force && (true !== $this->enabledReal() || 0 != $this->nextExecution())) {
+        if (false == Flags\is_flag_set($flags, self::FLAG_FORCE) && (true !== $this->enabledReal() || 0 != $this->nextExecution())) {
             throw new Exceptions\FailedToRunException((string) $this->path, 'Not enabled or due to be run yet.');
         }
 
-        $outputLastLine = exec(
-            // Add '2>&1' to the command to make sure errors are redirected
-            // to stdout and therefore captured by $output
-            sprintf('%s 2>&1', (string) $this->command),
-            $output,
-            $return_var
-        );
-
-        $this
-            ->lastOutput(implode(PHP_EOL, $output))
-            ->lastExecuted(time())
-            ->force(self::FORCE_EXECUTE_NO)
-            ->save(self::SAVE_MODE_DATABASE_ONLY)
-        ;
-
-        if (0 !== $return_var) {
-            throw new Exceptions\FailedToRunException((string) $this->path, $outputLastLine);
+        try {
+            Cli\run_command((string) $this->command, $output, $error);
+        } catch(Cli\Exeptions\RunCommandFailedException $ex) {
+            throw new Exceptions\FailedToRunException((string) $this->path, $ex->getError());
+        } finally {
+            $this
+                ->lastOutput($output . PHP_EOL . $error)
+                ->lastExecuted(time())
+                ->force(self::FORCE_EXECUTE_NO)
+                ->save(self::SAVE_MODE_DATABASE_ONLY)
+            ;
         }
     }
 
@@ -160,19 +160,23 @@ class Task extends PropertyBag\Lib\PropertyBag
 
         switch ((string) $this->interval->value->type) {
             case self::DURATION_WEEK:
-                $value *= 7;
+                $value = Time\weeks_to_seconds($value);
+                break;
 
-                // no break
             case self::DURATION_DAY:
-                $value *= 24;
+                $value = Time\days_to_seconds($value);
+                break;
 
-                // no break
             case self::DURATION_HOUR:
-                $value *= 60;
+                $value = Time\hours_to_seconds($value);
+                break;
+
+            case self::DURATION_MINUTE:
+                $value = Time\minutes_to_seconds($value);
                 break;
         }
 
-        return $value;
+        return (int)$value;
     }
 
     public function setInterval($value, string $type = self::DURATION_MINUTE): self
@@ -197,7 +201,7 @@ class Task extends PropertyBag\Lib\PropertyBag
             } elseif (null === $this->lastExecuted->value) {
                 $nextExecution = 0;
             } else {
-                $nextExecution = max(0, ($this->lastExecuted->value + ($this->intervalReal() * 60)) - time());
+                $nextExecution = max(0, ($this->lastExecuted->value + $this->intervalReal()) - time());
             }
         }
 
@@ -224,8 +228,13 @@ class Task extends PropertyBag\Lib\PropertyBag
     {
         // Create a default write function in case one is not provided
         if (null === $writeFunction) {
-            $writeFunction = function ($file, $data) {
-                return @file_put_contents($file, $data);
+            $writeFunction = function (string $file, string $data, ?string & $error): bool {
+                if(!@file_put_contents($file, $data)) {
+                    $error = "file_put_contents() failed. Check permissions on destination folder " . dirname($file);
+                    return false;
+                }
+
+                return true;
             };
         }
 
@@ -273,8 +282,8 @@ class Task extends PropertyBag\Lib\PropertyBag
         unset($data['force']);
 
         if (self::SAVE_MODE_DATABASE_ONLY != $saveMode) {
-            if (false === $writeFunction((string) $this->path, json_encode($data, JSON_PRETTY_PRINT))) {
-                throw new Exceptions\WritingFailedException((string) $this->path);
+            if (false === $writeFunction((string) $this->path, json_encode($data, JSON_PRETTY_PRINT), $error)) {
+                throw new Exceptions\WritingFailedException((string) $this->path, $error);
             }
         }
 
