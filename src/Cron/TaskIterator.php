@@ -9,7 +9,7 @@ final class TaskIterator implements \Iterator, \Countable
     private $iterator = null;
     private $count = null;
 
-    public function __construct($directory)
+    public function __construct(string $directory)
     {
         $this->iterator = new TaskFilterIterator($directory);
     }
