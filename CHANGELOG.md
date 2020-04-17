@@ -4,6 +4,25 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 **View all [Unreleased][] changes here**
 
+## [2.1.0][] - 2020-04-17
+#### Added
+-   Added `pointybeard/symphony-extended` to required packages and `extension.driver.php` to files autoload in `composer.json`
+-   Added Trigger Tasks event
+-   Added `Task::isReadyToRun()` method
+-   Added `extension.json`
+-   Added `FLAG_FORCE` flag used by run() method.
+-   Added support for running tasks in the seconds range
+
+#### Changed
+-   Extension driver now extends `AbstractExtension` from Symphony Extended Classes package
+-   Updaated `extension.meta.xml` with current information
+-   Updated `TaskIterator::__construct()` to expect a string
+-   Using `BroadcastAndListen` libraries when producing output from run command
+-   Using `Cli\run_command()` to process cron commands in `Task::run()`
+
+#### Fixed
+-   Fixed pointybeard/helpers version requirement
+
 ## [2.0.0][] - 2019-06-12
 #### Changed
 -   Major update to refactor code and work with the [Console Extension for Symphony CMS](https://github.com/pointybeard/console) and [PHP Helpers](https://github.com/pointybeard/helpers) meta package
@@ -55,7 +74,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 #### Added
 -   Initial release
 
-[Unreleased]: https://github.com/pointybeard/console/compare/2.0.0...integration
+[Unreleased]: https://github.com/pointybeard/console/compare/2.1.0...integration
+[2.0.0]: https://github.com/pointybeard/console/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/pointybeard/console/compare/1.1.1...2.0.0
 [1.1.1]: https://github.com/pointybeard/console/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/pointybeard/cron/compare/1.0.3...1.1.0
