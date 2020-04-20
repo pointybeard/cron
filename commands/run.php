@@ -75,7 +75,7 @@ class Run extends Console\AbstractCommand implements Console\Interfaces\Authenti
 
         foreach ($iterator as $task) {
             // --force is not set and this task isn't due to be executed
-            if (true !== $input->find('force') && false == $this->isReadyToRun()) {
+            if (true !== $input->find('force') && false == $task->isReadyToRun()) {
                 continue;
 
             // --task is set and the specified task filename is the same as
