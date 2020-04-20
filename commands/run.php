@@ -37,7 +37,7 @@ class Run extends Console\AbstractCommand implements Console\Interfaces\Authenti
     public function init(): void
     {
         parent::init();
-        Extension_Cron::init();
+
         $this
             ->addInputToCollection(
                 Cli\Input\InputTypeFactory::build('LongOption')
@@ -48,7 +48,7 @@ class Run extends Console\AbstractCommand implements Console\Interfaces\Authenti
                         function (Cli\Input\AbstractInputType $input, Cli\Input\AbstractInputHandler $context) {
                             $task = Cron\Task::load(sprintf(
                                 '%s/%s',
-                                CRON_PATH,
+                                MANIFEST . '/cron',
                                 strtolower($context->find('task'))
                             ));
 
@@ -69,9 +69,7 @@ class Run extends Console\AbstractCommand implements Console\Interfaces\Authenti
 
     public function execute(Cli\Input\Interfaces\InputHandlerInterface $input): bool
     {
-        Extension_Cron::init();
-
-        $iterator = new Cron\TaskIterator(CRON_PATH);
+        $iterator = new Cron\TaskIterator(MANIFEST . '/cron');
 
         $tasks = [];
 

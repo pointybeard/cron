@@ -36,13 +36,6 @@ if (!class_exists('\\Extension_Cron')) {
         ];
         }
 
-        public function __construct()
-        {
-            if (false == defined('CRON_PATH')) {
-                define('CRON_PATH', MANIFEST.'/cron');
-            }
-        }
-
         public function enable()
         {
             return $this->install();
@@ -58,7 +51,7 @@ if (!class_exists('\\Extension_Cron')) {
             parent::install();
 
             try {
-                Files\realise_directory(CRON_PATH);
+                Files\realise_directory(MANIFEST . '/cron');
             } catch (Files\Exceptions\Directory\AlreadyExistsException $ex) {
                 // Its okay, the cron folder already exists.
             }

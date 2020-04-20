@@ -33,7 +33,7 @@ class EventCronTriggerTasks extends SectionEvent
         $result = new XMLElement('cron-trigger-tasks');
         $tasks = new XMLElement('tasks');
 
-        $it = new Cron\TaskIterator(CRON_PATH);
+        $it = new Cron\TaskIterator(MANIFEST . '/cron');
 
         $skipped = $failed = $run = 0;
 
