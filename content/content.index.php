@@ -2,8 +2,18 @@
 
 declare(strict_types=1);
 
-use pointybeard\Symphony\Extensions\Cron;
+/*
+ * This file is part of the "Cron Tasks Extension for Symphony CMS" repository.
+ *
+ * Copyright 2009-2018 Alannah Kearney, Allen Chang
+ * Copyright 2019-2021 Alannah Kearney
+ *
+ * For the full copyright and license information, please view the LICENCE
+ * file that was distributed with this source code.
+ */
+
 use pointybeard\Helpers\Functions\Time;
+use pointybeard\Symphony\Extensions\Cron;
 
 class contentExtensionCronIndex extends AdministrationPage
 {
@@ -52,12 +62,12 @@ class contentExtensionCronIndex extends AdministrationPage
                     (string) $task->name,
                     sprintf('%sedit/%s/', Administration::instance()->getCurrentPageURL(), (string) $task->filename)
                 ));
-                $td1->appendChild(Widget::Label(__('Select Task %s', [(string) $task->filename]), null, 'accessible', null, array(
+                $td1->appendChild(Widget::Label(__('Select Task %s', [(string) $task->filename]), null, 'accessible', null, [
                     'for' => 'task-'.$ii,
-                )));
-                $td1->appendChild(Widget::Input('items['.(string) $task->filename.']', 'on', 'checkbox', array(
+                ]));
+                $td1->appendChild(Widget::Input('items['.(string) $task->filename.']', 'on', 'checkbox', [
                     'id' => 'task-'.$ii,
-                )));
+                ]));
 
                 $td2 = Widget::TableData(strlen(trim((string) $task->description)) <= 0 ? 'None' : (string) $task->description);
                 if (strlen(trim((string) $task->description)) <= 0) {
@@ -92,7 +102,7 @@ class contentExtensionCronIndex extends AdministrationPage
                     $td6 = Widget::TableData(Widget::Anchor('view', sprintf('%slog/%s/', Administration::instance()->getCurrentPageURL(), (string) $task->filename)));
                 }
 
-                $aTableBody[] = Widget::TableRow(array($td1, $td2, $td3, $td4, $td5, $td6));
+                $aTableBody[] = Widget::TableRow([$td1, $td2, $td3, $td4, $td5, $td6]);
             }
         }
 
@@ -102,7 +112,7 @@ class contentExtensionCronIndex extends AdministrationPage
             Widget::TableBody($aTableBody),
             'selectable',
             null,
-            array('role' => 'directory', 'aria-labelledby' => 'symphony-subheading', 'data-interactive' => 'data-interactive')
+            ['role' => 'directory', 'aria-labelledby' => 'symphony-subheading', 'data-interactive' => 'data-interactive']
         );
         $this->Form->appendChild($table);
 
@@ -185,9 +195,9 @@ class contentExtensionCronIndex extends AdministrationPage
                 } catch (Exception $ex) {
                     // Failed to save or delete
                     $this->pageAlert(
-                        __('There was a problem completing the request action on task "%s": %s', array(
+                        __('There was a problem completing the request action on task "%s": %s', [
                             $task->name, $ex->getMessage(),
-                        )),
+                        ]),
                         Alert::ERROR
                     );
 

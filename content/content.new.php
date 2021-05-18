@@ -2,6 +2,16 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the "Cron Tasks Extension for Symphony CMS" repository.
+ *
+ * Copyright 2009-2018 Alannah Kearney, Allen Chang
+ * Copyright 2019-2021 Alannah Kearney
+ *
+ * For the full copyright and license information, please view the LICENCE
+ * file that was distributed with this source code.
+ */
+
 use pointybeard\Symphony\Extensions\Cron;
 
 class contentExtensionCronNew extends AdministrationPage
@@ -20,7 +30,7 @@ class contentExtensionCronNew extends AdministrationPage
     public function __viewIndex()
     {
         $this->setPageType('form');
-        $this->setTitle(__('%1$s &ndash; %2$s &ndash; %3$s', array(__('New'), __('Cron'), __('Symphony'))));
+        $this->setTitle(__('%1$s &ndash; %2$s &ndash; %3$s', [__('New'), __('Cron'), __('Symphony')]));
         $this->appendSubheading(__('Untitled'));
 
         $formHasErrors = (bool) (is_array($this->_errors) && !empty($this->_errors));
@@ -60,7 +70,7 @@ class contentExtensionCronNew extends AdministrationPage
         $fieldset->appendChild((isset($this->_errors['description']) ? Widget::Error($label, $this->_errors['description']) : $label));
 
         $label = Widget::Label();
-        $input = Widget::Input('fields[interval]', (string) max(1, $fields['interval']), null, array('size' => '6'));
+        $input = Widget::Input('fields[interval]', (string) max(1, $fields['interval']), null, ['size' => '6']);
 
         $options = [
             [Cron\Task::DURATION_SECOND, (Cron\Task::DURATION_SECOND == $fields['interval-type']), Cron\Task::DURATION_SECOND.'s'],
@@ -80,8 +90,8 @@ class contentExtensionCronNew extends AdministrationPage
         }
 
         $label = Widget::Label();
-        $input = Widget::Input('fields[enabled]', 'yes', 'checkbox', (isset($fields['enabled']) ? array('checked' => 'checked') : null));
-        $label->setValue(__('%s Enable this task', array($input->generate(false))));
+        $input = Widget::Input('fields[enabled]', 'yes', 'checkbox', (isset($fields['enabled']) ? ['checked' => 'checked'] : null));
+        $label->setValue(__('%s Enable this task', [$input->generate(false)]));
         $fieldset->appendChild($label);
 
         $p = new XMLElement('p', '&uarr; Unless a <strong>start date</strong> has been specified, this task will be executed once the current date plus the interval specified has passed.');
@@ -94,7 +104,7 @@ class contentExtensionCronNew extends AdministrationPage
         $fieldset->setAttribute('class', 'settings');
         $fieldset->appendChild(new XMLElement('legend', __('Timing')));
 
-        $group = new XMLElement('div', null, array('class' => 'group'));
+        $group = new XMLElement('div', null, ['class' => 'group']);
 
         $label = Widget::Label('Start Date <i>Optional</i>');
         $label->appendChild(Widget::Input('fields[start]', $fields['start']));
@@ -114,7 +124,7 @@ class contentExtensionCronNew extends AdministrationPage
 
         $div = new XMLElement('div');
         $div->setAttribute('class', 'actions');
-        $div->appendChild(Widget::Input('action[save]', 'Create', 'submit', array('accesskey' => 's')));
+        $div->appendChild(Widget::Input('action[save]', 'Create', 'submit', ['accesskey' => 's']));
 
         $this->Form->appendChild($div);
     }
@@ -127,7 +137,7 @@ class contentExtensionCronNew extends AdministrationPage
 
         $fields = $_POST['fields'];
 
-        $this->_errors = array();
+        $this->_errors = [];
 
         if (!isset($fields['name']) || 0 == strlen(trim($fields['name']))) {
             $this->_errors['name'] = 'Name is a required field.';

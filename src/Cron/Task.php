@@ -2,31 +2,49 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the "Cron Tasks Extension for Symphony CMS" repository.
+ *
+ * Copyright 2009-2018 Alannah Kearney, Allen Chang
+ * Copyright 2019-2021 Alannah Kearney
+ *
+ * For the full copyright and license information, please view the LICENCE
+ * file that was distributed with this source code.
+ */
+
 namespace pointybeard\Symphony\Extensions\Cron;
 
-use SymphonyPDO;
-use pointybeard\PropertyBag;
-use pointybeard\Helpers\Functions\Json;
 use pointybeard\Helpers\Functions\Cli;
-use pointybeard\Helpers\Functions\Time;
 use pointybeard\Helpers\Functions\Flags;
+use pointybeard\Helpers\Functions\Json;
+use pointybeard\Helpers\Functions\Time;
+use pointybeard\PropertyBag;
+use SymphonyPDO;
 
 class Task extends PropertyBag\Lib\PropertyBag
 {
     public const FORCE_EXECUTE_YES = 'yes';
+
     public const FORCE_EXECUTE_NO = 'no';
 
     public const DURATION_SECOND = 'second';
+
     public const DURATION_MINUTE = 'minute';
+
     public const DURATION_DAY = 'day';
+
     public const DURATION_HOUR = 'hour';
+
     public const DURATION_WEEK = 'week';
 
     public const ENABLED = 1;
+
     public const DISABLED = 0;
 
     public const SAVE_MODE_DATABASE_ONLY = 0x0001;
+
     public const SAVE_MODE_FILE_ONLY = 0x0002;
+
     public const SAVE_MODE_BOTH = 0x0004;
 
     public const FLAG_FORCE = 0x0008;

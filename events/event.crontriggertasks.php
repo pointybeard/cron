@@ -2,6 +2,16 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the "Cron Tasks Extension for Symphony CMS" repository.
+ *
+ * Copyright 2009-2018 Alannah Kearney, Allen Chang
+ * Copyright 2019-2021 Alannah Kearney
+ *
+ * For the full copyright and license information, please view the LICENCE
+ * file that was distributed with this source code.
+ */
+
 use pointybeard\Symphony\Extensions\Cron;
 use SebastianBergmann\Timer\Timer;
 
@@ -33,13 +43,14 @@ class EventCronTriggerTasks extends SectionEvent
         $result = new XMLElement('cron-trigger-tasks');
         $tasks = new XMLElement('tasks');
 
-        $it = new Cron\TaskIterator(MANIFEST . '/cron');
+        $it = new Cron\TaskIterator(MANIFEST.'/cron');
 
         $skipped = $failed = $run = 0;
 
         foreach ($it as $index => $t) {
             if (false == $t->isReadyToRun()) {
                 ++$skipped;
+
                 continue;
             }
 

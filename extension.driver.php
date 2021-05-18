@@ -2,19 +2,25 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the "Cron Tasks Extension for Symphony CMS" repository.
+ *
+ * Copyright 2009-2018 Alannah Kearney, Allen Chang
+ * Copyright 2019-2021 Alannah Kearney
+ *
+ * For the full copyright and license information, please view the LICENCE
+ * file that was distributed with this source code.
+ */
+
 if (!file_exists(__DIR__.'/vendor/autoload.php')) {
-    throw new Exception(sprintf(
-        'Could not find composer autoload file %s. Did you run `composer update` in %s?',
-        __DIR__.'/vendor/autoload.php',
-        __DIR__
-    ));
+    throw new Exception(sprintf('Could not find composer autoload file %s. Did you run `composer update` in %s?', __DIR__.'/vendor/autoload.php', __DIR__));
 }
 
 require_once __DIR__.'/vendor/autoload.php';
 
-use pointybeard\Symphony\Extensions\Cron;
-use pointybeard\Symphony\Extended;
 use pointybeard\Helpers\Functions\Files;
+use pointybeard\Symphony\Extended;
+use pointybeard\Symphony\Extensions\Cron;
 
 // This file is included automatically in the composer autoloader, however,
 // Symphony might try to include it again which would cause a fatal error.
@@ -22,8 +28,9 @@ use pointybeard\Helpers\Functions\Files;
 if (!class_exists('\\Extension_Cron')) {
     class Extension_Cron extends Extended\AbstractExtension
     {
-        const SORT_ASCENDING = 'asc';
-        const SORT_DESCENDING = 'desc';
+        public const SORT_ASCENDING = 'asc';
+
+        public const SORT_DESCENDING = 'desc';
 
         public function fetchNavigation()
         {
@@ -51,7 +58,7 @@ if (!class_exists('\\Extension_Cron')) {
             parent::install();
 
             try {
-                Files\realise_directory(MANIFEST . '/cron');
+                Files\realise_directory(MANIFEST.'/cron');
             } catch (Files\Exceptions\Directory\AlreadyExistsException $ex) {
                 // Its okay, the cron folder already exists.
             }

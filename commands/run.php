@@ -2,19 +2,28 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the "Cron Tasks Extension for Symphony CMS" repository.
+ *
+ * Copyright 2009-2018 Alannah Kearney, Allen Chang
+ * Copyright 2019-2021 Alannah Kearney
+ *
+ * For the full copyright and license information, please view the LICENCE
+ * file that was distributed with this source code.
+ */
+
 namespace pointybeard\Symphony\Extensions\Console\Commands\Cron;
 
-use Extension_Cron;
-use pointybeard\Symphony\Extensions\Console;
 use pointybeard\Helpers\Cli;
 use pointybeard\Helpers\Cli\Colour\Colour;
-use pointybeard\Symphony\Extensions\Cron;
-use SebastianBergmann\Timer\Timer;
-use pointybeard\Symphony\Extensions\Cron\Task;
 use pointybeard\Helpers\Foundation\BroadcastAndListen;
+use pointybeard\Symphony\Extensions\Console;
 use pointybeard\Symphony\Extensions\Console\Commands\Console\Symphony;
+use pointybeard\Symphony\Extensions\Cron;
+use pointybeard\Symphony\Extensions\Cron\Task;
+use SebastianBergmann\Timer\Timer;
 
-class Run extends Console\AbstractCommand implements Console\Interfaces\AuthenticatedCommandInterface, BroadcastAndListen\Interfaces\AcceptsListenersInterface
+class run extends Console\AbstractCommand implements Console\Interfaces\AuthenticatedCommandInterface, BroadcastAndListen\Interfaces\AcceptsListenersInterface
 {
     use BroadcastAndListen\Traits\HasListenerTrait;
     use BroadcastAndListen\Traits\HasBroadcasterTrait;
@@ -48,7 +57,7 @@ class Run extends Console\AbstractCommand implements Console\Interfaces\Authenti
                         function (Cli\Input\AbstractInputType $input, Cli\Input\AbstractInputHandler $context) {
                             $task = Cron\Task::load(sprintf(
                                 '%s/%s',
-                                MANIFEST . '/cron',
+                                MANIFEST.'/cron',
                                 strtolower($context->find('task'))
                             ));
 
@@ -69,7 +78,7 @@ class Run extends Console\AbstractCommand implements Console\Interfaces\Authenti
 
     public function execute(Cli\Input\Interfaces\InputHandlerInterface $input): bool
     {
-        $iterator = new Cron\TaskIterator(MANIFEST . '/cron');
+        $iterator = new Cron\TaskIterator(MANIFEST.'/cron');
 
         $tasks = [];
 
