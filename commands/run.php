@@ -116,7 +116,7 @@ class run extends Console\AbstractCommand implements Console\Interfaces\Authenti
             Symphony::BROADCAST_MESSAGE,
             E_NOTICE,
             (new Cli\Message\Message())
-                ->message('Running Tasks (%d task/s found)')
+                ->message(sprintf('Running Tasks (%d task/s found)', count($tasks)))
                 ->foreground(Colour::FG_DEFAULT)
         );
 
