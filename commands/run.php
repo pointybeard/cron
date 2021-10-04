@@ -22,6 +22,7 @@ use pointybeard\Symphony\Extensions\Console\Commands\Console\Symphony;
 use pointybeard\Symphony\Extensions\Cron;
 use pointybeard\Symphony\Extensions\Cron\Task;
 use SebastianBergmann\Timer\Timer;
+use SebastianBergmann\Timer\ResourceUsageFormatter;
 
 class run extends Console\AbstractCommand implements Console\Interfaces\AuthenticatedCommandInterface, BroadcastAndListen\Interfaces\AcceptsListenersInterface
 {
@@ -119,8 +120,11 @@ class run extends Console\AbstractCommand implements Console\Interfaces\Authenti
                 ->foreground(Colour::FG_DEFAULT)
         );
 
+        $timer = new Timer;
+
         foreach ($tasks as $index => $task) {
-            Timer::start();
+
+            $timer->start();
 
             $this->broadcast(
                 Symphony::BROADCAST_MESSAGE,
@@ -139,15 +143,13 @@ class run extends Console\AbstractCommand implements Console\Interfaces\Authenti
             try {
                 $task->run(true == (bool) $input->find('force') ? Task::FLAG_FORCE : null);
 
-                $time = Timer::stop();
-
                 $this->broadcast(
                     Symphony::BROADCAST_MESSAGE,
                     E_NOTICE,
                     (new Cli\Message\Message())
                         ->message(sprintf(
                             'done (%s)',
-                            strtolower(Timer::resourceUsage())
+                            strtolower((new ResourceUsageFormatter)->resourceUsage($timer->stop()))
                         ))
                         ->foreground(Colour::FG_DEFAULT)
                 );
