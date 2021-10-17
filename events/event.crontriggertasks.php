@@ -47,6 +47,8 @@ class EventCronTriggerTasks extends SectionEvent
 
         $skipped = $failed = $run = 0;
 
+        $timer = new Timer;
+
         foreach ($it as $index => $t) {
             if (false == $t->isReadyToRun()) {
                 ++$skipped;
@@ -54,21 +56,22 @@ class EventCronTriggerTasks extends SectionEvent
                 continue;
             }
 
-            Timer::start();
+            $timer->start();
 
             $item = new XMLElement('item');
 
             try {
                 $t->run();
 
-                $time = Timer::stop();
+                $time = $timer->stop();
 
                 $item->setAttributeArray(
                     [
-                    'name' => (string) $t->name(),
-                    'filename' => (string) $t->filename(),
-                    'status' => 'success',
-                    'time' => $time, ]
+                        'name' => (string) $t->name(),
+                        'filename' => (string) $t->filename(),
+                        'status' => 'success',
+                        'time' => $time->asSeconds()
+                    ]
                 );
                 ++$run;
             } catch (\Exception $ex) {
