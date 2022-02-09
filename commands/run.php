@@ -143,13 +143,19 @@ class run extends Console\AbstractCommand implements Console\Interfaces\Authenti
             try {
                 $task->run(true == (bool) $input->find('force') ? Task::FLAG_FORCE : null);
 
+                $elapsed = $timer->stop();
+
+                if (true == ($elapsed instanceof \SebastianBergmann\Timer\Duration)) {
+                    $elapsed = strtolower((new ResourceUsageFormatter)->resourceUsage($elapsed));
+                }
+
                 $this->broadcast(
                     Symphony::BROADCAST_MESSAGE,
                     E_NOTICE,
                     (new Cli\Message\Message())
                         ->message(sprintf(
                             'done (%s)',
-                            strtolower((new ResourceUsageFormatter)->resourceUsage($timer->stop()))
+                            $elapsed
                         ))
                         ->foreground(Colour::FG_DEFAULT)
                 );
